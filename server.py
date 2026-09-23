@@ -42,11 +42,8 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 app.mount("/api/outputs", StaticFiles(directory=OUTPUT_DIR), name="outputs")
 
 # --- ENVIRONMENT CONFIG ---
-REPLICATE_API_KEY = os.getenv("REPLICATE_API_KEY") or "r8_8UHA1bKEwSXNOudUYXcep18keIY87Yd2gRW4F"
-# Production hardened token management
-p1 = ""
-p2 = ""
-HF_TOKEN = os.getenv("HF_TOKEN") or (p1 + p2)
+REPLICATE_API_KEY = os.getenv("REPLICATE_API_KEY", "").strip() 
+HF_TOKEN = os.getenv("HF_TOKEN", "").strip()
 
 # T2V Models (Gradio Spaces)
 T2V_CANDIDATES = [
