@@ -1,5 +1,4 @@
 def extract_image_path(result):
-    """Extract image path/URL safely from Gradio responses."""
     if result is None:
         return None
 
@@ -65,6 +64,7 @@ def run_image_gen(cand, prompt):
             28,
             api_name="/infer"
         )
+
         return extract_image_path(res)
 
     if cand["type"] == "sdxl":
@@ -86,6 +86,7 @@ def run_image_gen(cand, prompt):
             True,
             api_name="/predict"
         )
+
         return extract_image_path(res)
 
     return None
