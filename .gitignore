@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.log
+*.jpg
+*.jpeg
+*.png
+*.mp4
+*.webp
+*.json

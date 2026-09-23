@@ -1,0 +1,782 @@
+INFO:     127.0.0.1:53129 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.143.75.209:61634 - "GET / HTTP/1.1" 200 OK
+INFO:     10.143.75.209:61657 - "POST /mcp HTTP/1.1" 404 Not Found
+INFO:     10.143.75.209:61657 - "POST /mcp HTTP/1.1" 404 Not Found
+INFO:     10.143.75.209:61658 - "GET / HTTP/1.1" 200 OK
+INFO:     10.143.75.209:61662 - "GET /loginMsg.js HTTP/1.1" 404 Not Found
+INFO:     10.143.75.209:61663 - "GET /cgi/get.cgi?cmd=home_login HTTP/1.1" 404 Not Found
+2026-09-18 16:13:48,990 - RakaBackend - INFO - [T2V] Queued Job: af2a364a-77b0-4649-bbf9-c6afdead24fd
+2026-09-18 16:13:48,994 - RakaBackend - INFO - [T2V] Starting Job af2a364a-77b0-4649-bbf9-c6afdead24fd | Prompt: A cinematic view of a sunset over the ocean, Realistic style
+2026-09-18 16:13:50,264 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 16:13:51,778 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 16:13:52,505 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 16:13:52,902 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/heartbeat/4d23de26-2298-4469-bb1f-a8016a54b23a "HTTP/1.1 200 OK"
+2026-09-18 16:13:52,904 - RakaBackend - INFO - HTTP Request: POST https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 16:13:53,705 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/data?session_hash=4d23de26-2298-4469-bb1f-a8016a54b23a "HTTP/1.1 200 OK"
+2026-09-18 16:13:53,726 - RakaBackend - ERROR - [T2V] Failed for Job af2a364a-77b0-4649-bbf9-c6afdead24fd: You have exceeded your ZeroGPU quota (120s requested vs. -60s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-18 16:14:32,153 - RakaBackend - INFO - [VISION] Starting Analysis for outputs\img_086cb39a-4eb6-4870-b4d1-b5e6236f13b1.png
+2026-09-18 16:14:33,165 - RakaBackend - INFO - HTTP Request: GET https://qwen-qwen2-5-vl-32b-instruct.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 16:14:34,444 - RakaBackend - INFO - HTTP Request: GET https://qwen-qwen2-5-vl-32b-instruct.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 16:14:35,250 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 16:14:35,729 - RakaBackend - INFO - HTTP Request: GET https://qwen-qwen2-5-vl-32b-instruct.hf.space/gradio_api/heartbeat/84f8a21a-c8c7-4248-96cb-d569045c65e0 "HTTP/1.1 200 OK"
+2026-09-18 16:14:36,045 - RakaBackend - INFO - HTTP Request: POST https://qwen-qwen2-5-vl-32b-instruct.hf.space/gradio_api/upload "HTTP/1.1 200 OK"
+2026-09-18 16:14:37,005 - RakaBackend - INFO - HTTP Request: POST https://qwen-qwen2-5-vl-32b-instruct.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 16:14:37,933 - RakaBackend - INFO - HTTP Request: GET https://qwen-qwen2-5-vl-32b-instruct.hf.space/gradio_api/queue/data?session_hash=84f8a21a-c8c7-4248-96cb-d569045c65e0 "HTTP/1.1 200 OK"
+2026-09-18 16:14:38,931 - RakaBackend - INFO - HTTP Request: GET https://qwen-qwen2-5-vl-32b-instruct.hf.space/gradio_api/file=/tmp/gradio/fd2eb6aebdceec7a51d39b067c82b4038e24e05b5bd76698b0f7cc188715fdfa/img_086cb39a-4eb6-4870-b4d1-b5e6236f13b1.png "HTTP/1.1 200 OK"
+2026-09-18 16:14:39,891 - RakaBackend - INFO - HTTP Request: POST https://qwen-qwen2-5-vl-32b-instruct.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 16:14:40,844 - RakaBackend - INFO - HTTP Request: GET https://qwen-qwen2-5-vl-32b-instruct.hf.space/gradio_api/queue/data?session_hash=84f8a21a-c8c7-4248-96cb-d569045c65e0 "HTTP/1.1 200 OK"
+2026-09-18 16:14:40,855 - RakaBackend - ERROR - [VISION] Failed: The upstream Gradio app has raised an exception but has not enabled verbose error reporting. To enable, set show_error=True in launch().
+2026-09-18 16:47:10,324 - RakaBackend - INFO - [T2V] Queued Job: f45a31c8-57ce-42db-88c5-ff50136b92a9
+2026-09-18 16:47:10,332 - RakaBackend - INFO - [T2V] Job f45a31c8-57ce-42db-88c5-ff50136b92a9 | Prompt: A cinematic view of a sunset over the ocean, Realistic style
+2026-09-18 16:47:11,400 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 16:47:12,791 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 16:47:13,551 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 16:47:13,989 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/heartbeat/0112004f-ca8d-4b78-95e2-58d8519be572 "HTTP/1.1 200 OK"
+2026-09-18 16:47:14,018 - RakaBackend - INFO - HTTP Request: POST https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 16:47:14,918 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/data?session_hash=0112004f-ca8d-4b78-95e2-58d8519be572 "HTTP/1.1 200 OK"
+2026-09-18 16:47:14,948 - RakaBackend - ERROR - [T2V] Failed: You have exceeded your ZeroGPU quota (120s requested vs. -60s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-18 17:16:53,483 - RakaBackend - INFO - [IMAGE] Job 95e40da3-de41-4889-82db-297c777cefc0 | Prompt: young man standing himalaya , Realistic style, cinematic, high quality
+2026-09-18 17:16:54,950 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 17:16:56,439 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 17:16:57,104 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 17:16:57,525 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/heartbeat/cd36a333-85df-49e7-aee4-09483311d48a "HTTP/1.1 200 OK"
+2026-09-18 17:16:57,550 - RakaBackend - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 17:16:58,495 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/data?session_hash=cd36a333-85df-49e7-aee4-09483311d48a "HTTP/1.1 200 OK"
+2026-09-18 17:16:58,521 - RakaBackend - ERROR - [IMAGE] Failed: You have exceeded your ZeroGPU quota (90s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-18 17:17:02,135 - RakaBackend - INFO - [IMAGE] Job 55c196f4-af91-49c7-9106-3881ef1b50cc | Prompt: young man standing himalaya , Realistic style, cinematic, high quality
+2026-09-18 17:17:02,962 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 17:17:04,146 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 17:17:04,509 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 17:17:05,106 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/heartbeat/e00a3efc-9751-48d3-8456-c25388124d3a "HTTP/1.1 200 OK"
+2026-09-18 17:17:05,107 - RakaBackend - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 17:17:06,065 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/data?session_hash=e00a3efc-9751-48d3-8456-c25388124d3a "HTTP/1.1 200 OK"
+2026-09-18 17:17:06,076 - RakaBackend - ERROR - [IMAGE] Failed: You have exceeded your ZeroGPU quota (90s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-18 17:18:50,446 - RakaBackend - INFO - [IMAGE] Job 41e87a18-6a8e-478e-9c7b-a868fd0c5f52 | Prompt: young man standing himalaya , Realistic style, cinematic, high quality
+2026-09-18 17:18:51,572 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 17:18:52,603 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 17:18:53,058 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 17:18:53,455 - RakaBackend - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 17:18:53,458 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/heartbeat/2bbeeff1-1e2f-491c-969c-ddc18dafbaa8 "HTTP/1.1 200 OK"
+2026-09-18 17:18:54,387 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/data?session_hash=2bbeeff1-1e2f-491c-969c-ddc18dafbaa8 "HTTP/1.1 200 OK"
+2026-09-18 17:18:54,393 - RakaBackend - ERROR - [IMAGE] Failed: You have exceeded your ZeroGPU quota (90s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-18 17:18:56,719 - RakaBackend - INFO - [IMAGE] Job 56f984d5-0f8e-4c75-9575-3520ac786e7a | Prompt: young man standing himalaya , Realistic style, cinematic, high quality
+2026-09-18 17:18:57,653 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 17:18:59,022 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 17:18:59,530 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 17:19:00,177 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/heartbeat/4f1d9ccf-95ed-4747-ad7a-f8d6e286b577 "HTTP/1.1 200 OK"
+2026-09-18 17:19:00,178 - RakaBackend - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 17:19:01,144 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/data?session_hash=4f1d9ccf-95ed-4747-ad7a-f8d6e286b577 "HTTP/1.1 200 OK"
+2026-09-18 17:19:01,148 - RakaBackend - ERROR - [IMAGE] Failed: You have exceeded your ZeroGPU quota (90s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-18 17:39:06,349 - RakaBackend - INFO - [T2V] Queued Job: dc6f07db-8329-4ffd-8b84-75612d1c1f54
+2026-09-18 17:39:06,369 - RakaBackend - INFO - [T2V] Job dc6f07db-8329-4ffd-8b84-75612d1c1f54 | Prompt: A cinematic view of a sunset over the ocean, Realistic style, high quality video
+2026-09-18 17:39:07,874 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video "HTTP/1.1 200 OK"
+2026-09-18 17:39:08,193 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video/runtime "HTTP/1.1 200 OK"
+2026-09-18 17:39:09,100 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 17:39:10,220 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 17:39:10,593 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 17:39:11,166 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/heartbeat/6a657bb1-9727-4cb1-a104-ca2f82a02f84 "HTTP/1.1 200 OK"
+2026-09-18 17:39:11,169 - RakaBackend - INFO - HTTP Request: POST https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 17:39:12,155 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/data?session_hash=6a657bb1-9727-4cb1-a104-ca2f82a02f84 "HTTP/1.1 200 OK"
+2026-09-18 17:39:12,199 - RakaBackend - ERROR - [T2V] Failed for Job dc6f07db-8329-4ffd-8b84-75612d1c1f54: Unexpected response format from T2V Space: None
+2026-09-18 17:39:53,273 - RakaBackend - INFO - [I2V] Queued Job: fb395c05-ec93-4687-91e7-0679a6f8da7f
+2026-09-18 17:39:53,281 - RakaBackend - INFO - [I2V] Job fb395c05-ec93-4687-91e7-0679a6f8da7f | Input: outputs\input_fb395c05-ec93-4687-91e7-0679a6f8da7f.png
+2026-09-18 17:39:53,639 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Upsampler/wan-2-2-14b-image-to-video "HTTP/1.1 200 OK"
+2026-09-18 17:39:53,959 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Upsampler/wan-2-2-14b-image-to-video/runtime "HTTP/1.1 200 OK"
+2026-09-18 17:39:54,787 - RakaBackend - INFO - HTTP Request: GET https://upsampler-wan-2-2-14b-image-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 17:39:56,279 - RakaBackend - INFO - HTTP Request: GET https://upsampler-wan-2-2-14b-image-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 17:39:56,530 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 17:39:57,087 - RakaBackend - INFO - HTTP Request: GET https://upsampler-wan-2-2-14b-image-to-video.hf.space/gradio_api/heartbeat/ee21349b-a554-4d73-b1c7-fe9edfdfd3a4 "HTTP/1.1 200 OK"
+2026-09-18 17:39:58,114 - RakaBackend - INFO - HTTP Request: POST https://upsampler-wan-2-2-14b-image-to-video.hf.space/gradio_api/upload "HTTP/1.1 200 OK"
+2026-09-18 17:39:59,072 - RakaBackend - INFO - HTTP Request: POST https://upsampler-wan-2-2-14b-image-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 17:40:00,003 - RakaBackend - INFO - HTTP Request: GET https://upsampler-wan-2-2-14b-image-to-video.hf.space/gradio_api/queue/data?session_hash=ee21349b-a554-4d73-b1c7-fe9edfdfd3a4 "HTTP/1.1 200 OK"
+2026-09-18 17:40:00,050 - RakaBackend - ERROR - [I2V] Failed for Job fb395c05-ec93-4687-91e7-0679a6f8da7f: You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-18 17:59:52,316 - RakaBackend - INFO - [T2V] Trying candidate: liuyuyuil/Wanx2.1_Text_to_Video (wan21_direct)
+2026-09-18 17:59:53,134 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video "HTTP/1.1 200 OK"
+2026-09-18 17:59:53,454 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video/runtime "HTTP/1.1 200 OK"
+2026-09-18 17:59:54,416 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 17:59:55,375 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 17:59:55,695 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 17:59:56,180 - RakaBackend - INFO - HTTP Request: POST https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 17:59:56,198 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/heartbeat/62d3b29d-488e-48b9-9fb8-f118cf52f212 "HTTP/1.1 200 OK"
+2026-09-18 17:59:56,999 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/data?session_hash=62d3b29d-488e-48b9-9fb8-f118cf52f212 "HTTP/1.1 200 OK"
+2026-09-18 17:59:57,008 - RakaBackend - ERROR - [T2V] Candidate liuyuyuil/Wanx2.1_Text_to_Video failed: 'NoneType' object has no attribute 'get'
+2026-09-18 18:10:00,595 - RakaBackend - INFO - [T2V] Attempting liuyuyuil/Wanx2.1_Text_to_Video...
+2026-09-18 18:10:01,447 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video "HTTP/1.1 200 OK"
+2026-09-18 18:10:01,768 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video/runtime "HTTP/1.1 200 OK"
+2026-09-18 18:10:02,823 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 18:10:03,874 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 18:10:04,166 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 18:10:04,805 - RakaBackend - INFO - HTTP Request: POST https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 18:10:04,806 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/heartbeat/c2748b30-03b1-4a8a-ba97-c870fbb8dd4e "HTTP/1.1 200 OK"
+2026-09-18 18:10:05,765 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/data?session_hash=c2748b30-03b1-4a8a-ba97-c870fbb8dd4e "HTTP/1.1 200 OK"
+2026-09-18 18:10:05,781 - RakaBackend - INFO - [T2V] Attempting Shimti/shimti-ltx-video...
+2026-09-18 18:10:06,093 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Shimti/shimti-ltx-video "HTTP/1.1 200 OK"
+2026-09-18 18:10:06,404 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Shimti/shimti-ltx-video/runtime "HTTP/1.1 200 OK"
+2026-09-18 18:10:11,974 - RakaBackend - ERROR - [T2V] Candidate Shimti/shimti-ltx-video failed: The read operation timed out
+2026-09-18 18:31:55,252 - RakaBackend - INFO - [T2V] Trying liuyuyuil/Wanx2.1_Text_to_Video...
+2026-09-18 18:31:56,042 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video "HTTP/1.1 200 OK"
+2026-09-18 18:31:56,299 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video/runtime "HTTP/1.1 200 OK"
+2026-09-18 18:31:57,292 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 18:31:58,565 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 18:31:58,884 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 18:31:59,531 - RakaBackend - INFO - HTTP Request: POST https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 18:31:59,532 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/heartbeat/cf92387d-cac1-4883-a725-5a0dacdd8fde "HTTP/1.1 200 OK"
+2026-09-18 18:32:00,418 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/data?session_hash=cf92387d-cac1-4883-a725-5a0dacdd8fde "HTTP/1.1 200 OK"
+2026-09-18 18:32:00,459 - RakaBackend - INFO - [T2V] Client returned None, switching to manual poller for liuyuyuil/Wanx2.1_Text_to_Video...
+2026-09-18 18:32:02,085 - RakaBackend - ERROR - Manual poll failed for https://liuyuyuil-wanx2-1-text-to-video.hf.space: Job completed but no data returned: {'error': None}
+2026-09-18 18:32:02,086 - RakaBackend - ERROR - [T2V] liuyuyuil/Wanx2.1_Text_to_Video failed: Job completed but no data returned: {'error': None}
+2026-09-18 18:39:36,799 - RakaBackend - INFO - [T2V] Requesting Lightricks/ltx-video-distilled (ltx)...
+2026-09-18 18:39:37,597 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled "HTTP/1.1 200 OK"
+2026-09-18 18:39:37,924 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled/runtime "HTTP/1.1 200 OK"
+2026-09-18 18:39:38,885 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 18:39:40,273 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 18:39:40,781 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 18:39:41,334 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/heartbeat/7b11dda5-e3c4-4dcd-ad3f-4674801aed26 "HTTP/1.1 200 OK"
+2026-09-18 18:39:41,387 - RakaBackend - INFO - HTTP Request: POST https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 18:39:42,218 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/data?session_hash=7b11dda5-e3c4-4dcd-ad3f-4674801aed26 "HTTP/1.1 200 OK"
+2026-09-18 18:39:42,264 - RakaBackend - ERROR - [T2V] Candidate Lightricks/ltx-video-distilled failed: You have exceeded your ZeroGPU quota (120s requested vs. -60s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-18 18:39:42,265 - RakaBackend - INFO - [T2V] Requesting THUDM/CogVideoX-5B-Space (cogvideo)...
+2026-09-18 18:39:42,558 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/THUDM/CogVideoX-5B-Space "HTTP/1.1 307 Temporary Redirect"
+2026-09-18 18:39:42,814 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/zai-org/CogVideoX-5B-Space "HTTP/1.1 200 OK"
+2026-09-18 18:39:43,204 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/THUDM/CogVideoX-5B-Space/runtime "HTTP/1.1 307 Temporary Redirect"
+2026-09-18 18:39:43,518 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/zai-org/CogVideoX-5B-Space/runtime "HTTP/1.1 200 OK"
+2026-09-18 18:39:44,554 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 18:39:45,987 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 18:39:46,470 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 18:39:47,196 - RakaBackend - INFO - HTTP Request: POST https://zai-org-cogvideox-5b-space.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 18:39:47,197 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/heartbeat/bcda8ca5-93cc-4b1a-8eea-45e2b1524db8 "HTTP/1.1 200 OK"
+2026-09-18 18:39:48,219 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/queue/data?session_hash=bcda8ca5-93cc-4b1a-8eea-45e2b1524db8 "HTTP/1.1 200 OK"
+2026-09-18 18:39:48,270 - RakaBackend - ERROR - [T2V] Candidate THUDM/CogVideoX-5B-Space failed: You have exceeded your ZeroGPU quota (300s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-18 18:59:07,898 - RakaBackend - INFO - [T2V] Requesting liuyuyuil/Wanx2.1_Text_to_Video (wan21)...
+2026-09-18 18:59:08,948 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video "HTTP/1.1 200 OK"
+2026-09-18 18:59:09,236 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video/runtime "HTTP/1.1 200 OK"
+2026-09-18 18:59:10,073 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 18:59:11,180 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 18:59:11,510 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 18:59:12,141 - RakaBackend - INFO - HTTP Request: POST https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 18:59:12,142 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/heartbeat/88e745d1-51f7-40f5-aae4-87ac17148fa5 "HTTP/1.1 200 OK"
+2026-09-18 18:59:13,107 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/data?session_hash=88e745d1-51f7-40f5-aae4-87ac17148fa5 "HTTP/1.1 200 OK"
+2026-09-18 18:59:13,136 - RakaBackend - INFO - [T2V] Raw result from liuyuyuil/Wanx2.1_Text_to_Video: Type=<class 'NoneType'>, Value=None
+2026-09-18 18:59:13,137 - RakaBackend - INFO - [T2V] Requesting Lightricks/ltx-video-distilled (ltx)...
+2026-09-18 18:59:13,441 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled "HTTP/1.1 200 OK"
+2026-09-18 18:59:13,747 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled/runtime "HTTP/1.1 200 OK"
+2026-09-18 18:59:14,732 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 18:59:16,299 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 18:59:16,889 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 18:59:17,538 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/heartbeat/bd9148f1-3e14-47e9-a4d6-d33ef7c1d376 "HTTP/1.1 200 OK"
+2026-09-18 18:59:17,556 - RakaBackend - INFO - HTTP Request: POST https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 18:59:18,493 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/data?session_hash=bd9148f1-3e14-47e9-a4d6-d33ef7c1d376 "HTTP/1.1 200 OK"
+2026-09-18 18:59:18,496 - RakaBackend - ERROR - [T2V] Error on Lightricks/ltx-video-distilled: You have exceeded your ZeroGPU quota (120s requested vs. -60s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-18 18:59:18,497 - RakaBackend - INFO - [T2V] Requesting THUDM/CogVideoX-5B-Space (cogvideo)...
+2026-09-18 18:59:18,755 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/THUDM/CogVideoX-5B-Space "HTTP/1.1 307 Temporary Redirect"
+2026-09-18 18:59:19,071 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/zai-org/CogVideoX-5B-Space "HTTP/1.1 200 OK"
+2026-09-18 18:59:19,346 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/THUDM/CogVideoX-5B-Space/runtime "HTTP/1.1 307 Temporary Redirect"
+2026-09-18 18:59:19,666 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/zai-org/CogVideoX-5B-Space/runtime "HTTP/1.1 200 OK"
+2026-09-18 18:59:20,594 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 18:59:22,381 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 18:59:23,049 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 18:59:23,980 - RakaBackend - INFO - HTTP Request: POST https://zai-org-cogvideox-5b-space.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 18:59:23,981 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/heartbeat/40053162-9498-42b9-b8f7-5710305a6aab "HTTP/1.1 200 OK"
+2026-09-18 18:59:24,946 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/queue/data?session_hash=40053162-9498-42b9-b8f7-5710305a6aab "HTTP/1.1 200 OK"
+2026-09-18 18:59:24,964 - RakaBackend - ERROR - [T2V] Error on THUDM/CogVideoX-5B-Space: You have exceeded your ZeroGPU quota (300s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-18 19:15:47,677 - RakaBackend - INFO - [T2V] Attempting Lightricks/ltx-video-distilled (ltx)...
+2026-09-18 19:15:48,613 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled "HTTP/1.1 200 OK"
+2026-09-18 19:15:48,952 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled/runtime "HTTP/1.1 200 OK"
+2026-09-18 19:15:49,817 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 19:15:51,296 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 19:15:51,814 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 19:15:52,376 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/heartbeat/e4197334-0dd6-499f-b625-017a2bd45a0c "HTTP/1.1 200 OK"
+2026-09-18 19:15:52,401 - RakaBackend - INFO - HTTP Request: POST https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 19:15:53,204 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/data?session_hash=e4197334-0dd6-499f-b625-017a2bd45a0c "HTTP/1.1 200 OK"
+2026-09-18 19:15:53,231 - RakaBackend - WARNING - [T2V] ZERO_GPU_QUOTA on Lightricks/ltx-video-distilled
+2026-09-18 19:15:53,231 - RakaBackend - INFO - [T2V] Attempting THUDM/CogVideoX-5B-Space (cogvideo)...
+2026-09-18 19:15:53,498 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/THUDM/CogVideoX-5B-Space "HTTP/1.1 307 Temporary Redirect"
+2026-09-18 19:15:53,882 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/zai-org/CogVideoX-5B-Space "HTTP/1.1 200 OK"
+2026-09-18 19:15:54,158 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/THUDM/CogVideoX-5B-Space/runtime "HTTP/1.1 307 Temporary Redirect"
+2026-09-18 19:15:54,434 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/zai-org/CogVideoX-5B-Space/runtime "HTTP/1.1 200 OK"
+2026-09-18 19:15:55,492 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 19:15:57,172 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 19:15:57,677 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 19:15:58,366 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/heartbeat/aa272cf5-c5db-4a69-8a3b-f32abfb117fd "HTTP/1.1 200 OK"
+2026-09-18 19:15:58,366 - RakaBackend - INFO - HTTP Request: POST https://zai-org-cogvideox-5b-space.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 19:15:59,175 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/queue/data?session_hash=aa272cf5-c5db-4a69-8a3b-f32abfb117fd "HTTP/1.1 200 OK"
+2026-09-18 19:15:59,195 - RakaBackend - WARNING - [T2V] ZERO_GPU_QUOTA on THUDM/CogVideoX-5B-Space
+2026-09-18 19:15:59,196 - RakaBackend - INFO - [T2V] Attempting mediasynthesismuseum/modelscope-text-to-video (modelscope)...
+2026-09-18 19:15:59,473 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/mediasynthesismuseum/modelscope-text-to-video "HTTP/1.1 200 OK"
+2026-09-18 19:15:59,748 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/mediasynthesismuseum/modelscope-text-to-video/runtime "HTTP/1.1 200 OK"
+2026-09-18 19:16:00,609 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 19:16:01,605 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 19:16:01,869 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 19:16:02,361 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/heartbeat/00161b4d-4193-42cb-8197-15b19caa50af "HTTP/1.1 200 OK"
+2026-09-18 19:16:02,395 - RakaBackend - INFO - HTTP Request: POST https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 19:16:03,295 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/queue/data?session_hash=00161b4d-4193-42cb-8197-15b19caa50af "HTTP/1.1 200 OK"
+2026-09-18 19:16:03,326 - RakaBackend - WARNING - [T2V] ZERO_GPU_QUOTA on mediasynthesismuseum/modelscope-text-to-video
+2026-09-18 19:16:03,326 - RakaBackend - INFO - [T2V] Attempting liuyuyuil/Wanx2.1_Text_to_Video (wan21)...
+2026-09-18 19:16:03,613 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video "HTTP/1.1 200 OK"
+2026-09-18 19:16:03,875 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video/runtime "HTTP/1.1 200 OK"
+2026-09-18 19:16:04,669 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 19:16:05,672 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 19:16:05,936 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 19:16:06,472 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/heartbeat/7e62df0a-d26b-42b7-a7e3-5ddcc99928d6 "HTTP/1.1 200 OK"
+2026-09-18 19:16:06,473 - RakaBackend - INFO - HTTP Request: POST https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 19:16:07,374 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/data?session_hash=7e62df0a-d26b-42b7-a7e3-5ddcc99928d6 "HTTP/1.1 200 OK"
+2026-09-18 19:16:07,398 - RakaBackend - INFO - [T2V] Raw result path: None (Type: <class 'NoneType'>)
+2026-09-18 19:31:14,320 - RakaBackend - INFO - [T2V] Attempting Lightricks/ltx-video-distilled (ltx)...
+2026-09-18 19:31:15,101 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled "HTTP/1.1 200 OK"
+2026-09-18 19:31:15,478 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled/runtime "HTTP/1.1 200 OK"
+2026-09-18 19:31:16,358 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 19:31:17,766 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 19:31:18,533 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 19:31:19,069 - RakaBackend - INFO - HTTP Request: POST https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 19:31:19,076 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/heartbeat/82aee141-e04b-4068-9025-05ac8d7edcf3 "HTTP/1.1 200 OK"
+2026-09-18 19:31:19,975 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/data?session_hash=82aee141-e04b-4068-9025-05ac8d7edcf3 "HTTP/1.1 200 OK"
+2026-09-18 19:31:19,997 - RakaBackend - ERROR - [T2V] ZERO_GPU_QUOTA: You have exceeded your ZeroGPU quota (120s requested vs. -60s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-18 19:31:19,997 - RakaBackend - INFO - [T2V] Attempting THUDM/CogVideoX-5B-Space (cogvideo)...
+2026-09-18 19:31:20,248 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/THUDM/CogVideoX-5B-Space "HTTP/1.1 307 Temporary Redirect"
+2026-09-18 19:31:20,501 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/zai-org/CogVideoX-5B-Space "HTTP/1.1 200 OK"
+2026-09-18 19:31:20,742 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/THUDM/CogVideoX-5B-Space/runtime "HTTP/1.1 307 Temporary Redirect"
+2026-09-18 19:31:21,003 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/zai-org/CogVideoX-5B-Space/runtime "HTTP/1.1 200 OK"
+2026-09-18 19:31:21,861 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 19:31:23,368 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 19:31:23,863 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 19:31:24,392 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/heartbeat/328783d2-c9ca-4936-8a56-18d0a5352200 "HTTP/1.1 200 OK"
+2026-09-18 19:31:24,429 - RakaBackend - INFO - HTTP Request: POST https://zai-org-cogvideox-5b-space.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 19:31:25,265 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/queue/data?session_hash=328783d2-c9ca-4936-8a56-18d0a5352200 "HTTP/1.1 200 OK"
+2026-09-18 19:31:25,307 - RakaBackend - ERROR - [T2V] ZERO_GPU_QUOTA: You have exceeded your ZeroGPU quota (300s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-18 19:31:25,307 - RakaBackend - INFO - [T2V] Attempting mediasynthesismuseum/modelscope-text-to-video (modelscope)...
+2026-09-18 19:31:25,575 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/mediasynthesismuseum/modelscope-text-to-video "HTTP/1.1 200 OK"
+2026-09-18 19:31:25,895 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/mediasynthesismuseum/modelscope-text-to-video/runtime "HTTP/1.1 200 OK"
+2026-09-18 19:31:26,827 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 19:31:27,913 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 19:31:28,240 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 19:31:28,860 - RakaBackend - INFO - HTTP Request: POST https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 19:31:28,905 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/heartbeat/42fcd373-0e9f-4bb9-9d0a-02ceae968d3b "HTTP/1.1 200 OK"
+2026-09-18 19:31:29,752 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/queue/data?session_hash=42fcd373-0e9f-4bb9-9d0a-02ceae968d3b "HTTP/1.1 200 OK"
+2026-09-18 19:31:29,793 - RakaBackend - ERROR - [T2V] ZERO_GPU_QUOTA: You have exceeded your ZeroGPU quota (90s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-18 19:31:29,793 - RakaBackend - INFO - [T2V] Attempting liuyuyuil/Wanx2.1_Text_to_Video (wan21)...
+2026-09-18 19:31:30,060 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video "HTTP/1.1 200 OK"
+2026-09-18 19:31:30,304 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video/runtime "HTTP/1.1 200 OK"
+2026-09-18 19:31:31,185 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 19:31:32,401 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 19:31:32,648 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 19:31:33,198 - RakaBackend - INFO - HTTP Request: POST https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 19:31:33,218 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/heartbeat/4541cf81-a7e9-428b-a968-85010e5af058 "HTTP/1.1 200 OK"
+2026-09-18 19:31:33,987 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/data?session_hash=4541cf81-a7e9-428b-a968-85010e5af058 "HTTP/1.1 200 OK"
+2026-09-18 19:31:34,023 - RakaBackend - INFO - [T2V] liuyuyuil/Wanx2.1_Text_to_Video returned Type: <class 'NoneType'> | Value: None
+2026-09-18 19:31:34,024 - RakaBackend - WARNING - [T2V] No valid video path extracted from liuyuyuil/Wanx2.1_Text_to_Video
+2026-09-18 20:04:19,015 - RakaBackend - INFO - [T2V] Attempting Lightricks/ltx-video-distilled (ltx)...
+2026-09-18 20:04:19,779 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled "HTTP/1.1 200 OK"
+2026-09-18 20:04:20,164 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled/runtime "HTTP/1.1 200 OK"
+2026-09-18 20:04:21,285 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 20:04:23,043 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 20:04:23,595 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 20:04:24,228 - RakaBackend - INFO - HTTP Request: POST https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 20:04:24,228 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/heartbeat/039941da-4136-423a-b63e-2ea46a34117d "HTTP/1.1 200 OK"
+2026-09-18 20:04:25,079 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/data?session_hash=039941da-4136-423a-b63e-2ea46a34117d "HTTP/1.1 200 OK"
+2026-09-18 20:04:25,112 - RakaBackend - ERROR - [T2V] ZERO_GPU_QUOTA: You have exceeded your ZeroGPU quota (120s requested vs. -60s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-18 20:04:25,112 - RakaBackend - INFO - [T2V] Attempting THUDM/CogVideoX-5B-Space (cogvideo)...
+2026-09-18 20:04:25,434 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/THUDM/CogVideoX-5B-Space "HTTP/1.1 307 Temporary Redirect"
+2026-09-18 20:04:25,778 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/zai-org/CogVideoX-5B-Space "HTTP/1.1 200 OK"
+2026-09-18 20:04:26,084 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/THUDM/CogVideoX-5B-Space/runtime "HTTP/1.1 307 Temporary Redirect"
+2026-09-18 20:04:26,344 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/zai-org/CogVideoX-5B-Space/runtime "HTTP/1.1 200 OK"
+2026-09-18 20:04:27,365 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 20:04:28,766 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 20:04:29,445 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 20:04:30,015 - RakaBackend - INFO - HTTP Request: POST https://zai-org-cogvideox-5b-space.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 20:04:30,015 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/heartbeat/ab4b9a21-c278-417a-84dc-4bf9ee8857f6 "HTTP/1.1 200 OK"
+2026-09-18 20:04:30,927 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/queue/data?session_hash=ab4b9a21-c278-417a-84dc-4bf9ee8857f6 "HTTP/1.1 200 OK"
+2026-09-18 20:04:30,941 - RakaBackend - ERROR - [T2V] ZERO_GPU_QUOTA: You have exceeded your ZeroGPU quota (300s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-18 20:04:30,941 - RakaBackend - INFO - [T2V] Attempting mediasynthesismuseum/modelscope-text-to-video (modelscope)...
+2026-09-18 20:04:31,204 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/mediasynthesismuseum/modelscope-text-to-video "HTTP/1.1 200 OK"
+2026-09-18 20:04:31,474 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/mediasynthesismuseum/modelscope-text-to-video/runtime "HTTP/1.1 200 OK"
+2026-09-18 20:04:32,502 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 20:04:33,744 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 20:04:34,007 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 20:04:34,724 - RakaBackend - INFO - HTTP Request: POST https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 20:04:34,741 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/heartbeat/3c2dc568-1fd1-465b-a137-6db215c64dad "HTTP/1.1 200 OK"
+2026-09-18 20:04:35,691 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/queue/data?session_hash=3c2dc568-1fd1-465b-a137-6db215c64dad "HTTP/1.1 200 OK"
+2026-09-18 20:04:35,701 - RakaBackend - ERROR - [T2V] ZERO_GPU_QUOTA: You have exceeded your ZeroGPU quota (90s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-18 20:04:35,702 - RakaBackend - INFO - [T2V] Attempting liuyuyuil/Wanx2.1_Text_to_Video (wan21)...
+2026-09-18 20:04:35,977 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video "HTTP/1.1 200 OK"
+2026-09-18 20:04:36,244 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video/runtime "HTTP/1.1 200 OK"
+2026-09-18 20:04:37,227 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 20:04:38,270 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 20:04:38,515 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 20:04:39,072 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/heartbeat/10e632ed-d50e-468f-8597-cf5042185fb9 "HTTP/1.1 200 OK"
+2026-09-18 20:04:39,073 - RakaBackend - INFO - HTTP Request: POST https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 20:04:39,946 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/data?session_hash=10e632ed-d50e-468f-8597-cf5042185fb9 "HTTP/1.1 200 OK"
+2026-09-18 20:04:41,217 - RakaBackend - INFO - [T2V] liuyuyuil/Wanx2.1_Text_to_Video returned Type: <class 'NoneType'> | Value: None
+2026-09-18 20:04:41,217 - RakaBackend - WARNING - [T2V] No valid video path extracted from liuyuyuil/Wanx2.1_Text_to_Video
+2026-09-18 20:18:10,243 - RakaBackend - INFO - [T2V] Attempting Lightricks/ltx-video-distilled (ltx)...
+2026-09-18 20:18:11,500 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled "HTTP/1.1 200 OK"
+2026-09-18 20:18:11,758 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled/runtime "HTTP/1.1 200 OK"
+2026-09-18 20:18:12,851 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 20:18:14,275 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 20:18:14,802 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 20:18:15,408 - RakaBackend - INFO - HTTP Request: POST https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 20:18:15,425 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/heartbeat/aee55248-0ec8-42f0-abe9-a7b21950b53d "HTTP/1.1 200 OK"
+2026-09-18 20:18:16,312 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/data?session_hash=aee55248-0ec8-42f0-abe9-a7b21950b53d "HTTP/1.1 200 OK"
+2026-09-18 20:18:16,334 - RakaBackend - ERROR - [T2V] ZERO_GPU_QUOTA on Lightricks/ltx-video-distilled: You have exceeded your ZeroGPU quota (120s requested vs. -60s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - htt...
+2026-09-18 20:18:16,335 - RakaBackend - INFO - [T2V] Attempting THUDM/CogVideoX-5B-Space (cogvideo)...
+2026-09-18 20:18:16,702 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/THUDM/CogVideoX-5B-Space "HTTP/1.1 307 Temporary Redirect"
+2026-09-18 20:18:17,328 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/zai-org/CogVideoX-5B-Space "HTTP/1.1 200 OK"
+2026-09-18 20:18:17,650 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/THUDM/CogVideoX-5B-Space/runtime "HTTP/1.1 307 Temporary Redirect"
+2026-09-18 20:18:17,978 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/zai-org/CogVideoX-5B-Space/runtime "HTTP/1.1 200 OK"
+2026-09-18 20:18:19,088 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 20:18:20,509 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 20:18:21,096 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 20:18:21,667 - RakaBackend - INFO - HTTP Request: POST https://zai-org-cogvideox-5b-space.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 20:18:21,755 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/heartbeat/098aad91-6f27-4f33-9d3e-95410a048e8d "HTTP/1.1 200 OK"
+2026-09-18 20:18:22,562 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/queue/data?session_hash=098aad91-6f27-4f33-9d3e-95410a048e8d "HTTP/1.1 200 OK"
+2026-09-18 20:18:22,600 - RakaBackend - ERROR - [T2V] ZERO_GPU_QUOTA on THUDM/CogVideoX-5B-Space: You have exceeded your ZeroGPU quota (300s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https...
+2026-09-18 20:18:22,600 - RakaBackend - INFO - [T2V] Attempting mediasynthesismuseum/modelscope-text-to-video (modelscope)...
+2026-09-18 20:18:22,873 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/mediasynthesismuseum/modelscope-text-to-video "HTTP/1.1 200 OK"
+2026-09-18 20:18:23,122 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/mediasynthesismuseum/modelscope-text-to-video/runtime "HTTP/1.1 200 OK"
+2026-09-18 20:18:24,217 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 20:18:25,522 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 20:18:25,792 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 20:18:26,419 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/heartbeat/42f4be9c-3476-4e9d-baf7-af1fc6c32f64 "HTTP/1.1 200 OK"
+2026-09-18 20:18:26,428 - RakaBackend - INFO - HTTP Request: POST https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 20:18:27,364 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/queue/data?session_hash=42f4be9c-3476-4e9d-baf7-af1fc6c32f64 "HTTP/1.1 200 OK"
+2026-09-18 20:18:27,413 - RakaBackend - ERROR - [T2V] ZERO_GPU_QUOTA on mediasynthesismuseum/modelscope-text-to-video: You have exceeded your ZeroGPU quota (90s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https:...
+2026-09-18 20:18:27,414 - RakaBackend - INFO - [T2V] Attempting liuyuyuil/Wanx2.1_Text_to_Video (wan21)...
+2026-09-18 20:18:27,896 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video "HTTP/1.1 200 OK"
+2026-09-18 20:18:28,307 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video/runtime "HTTP/1.1 200 OK"
+2026-09-18 20:18:29,191 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 20:18:30,300 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 20:18:30,567 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 20:18:31,257 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/heartbeat/a5e50ae8-9247-4139-bac7-afdfbbc20383 "HTTP/1.1 200 OK"
+2026-09-18 20:18:31,258 - RakaBackend - INFO - HTTP Request: POST https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 20:18:32,369 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/data?session_hash=a5e50ae8-9247-4139-bac7-afdfbbc20383 "HTTP/1.1 200 OK"
+2026-09-18 20:18:32,386 - RakaBackend - INFO - [T2V] liuyuyuil/Wanx2.1_Text_to_Video returned Type: <class 'NoneType'> | Value: None...
+2026-09-18 20:18:32,387 - RakaBackend - WARNING - [T2V] No valid video path extracted from liuyuyuil/Wanx2.1_Text_to_Video
+2026-09-18 20:18:32,387 - RakaBackend - INFO - [FALLBACK] Using Replicate Minimax as ultimate fallback...
+2026-09-18 20:21:13,796 - RakaBackend - INFO - [T2V] SUCCESS via REPLICATE: outputs\33b62880-38ef-47a3-a8ca-b763d10f01d1.mp4
+2026-09-18 20:22:12,541 - RakaBackend - INFO - [I2V] Attempting Upsampler/wan-2-2-14b-image-to-video (wan22)...
+2026-09-18 20:22:13,119 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Upsampler/wan-2-2-14b-image-to-video "HTTP/1.1 200 OK"
+2026-09-18 20:22:13,423 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Upsampler/wan-2-2-14b-image-to-video/runtime "HTTP/1.1 200 OK"
+2026-09-18 20:22:14,543 - RakaBackend - INFO - HTTP Request: GET https://upsampler-wan-2-2-14b-image-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 20:22:15,708 - RakaBackend - INFO - HTTP Request: GET https://upsampler-wan-2-2-14b-image-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 20:22:16,050 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 20:22:16,698 - RakaBackend - INFO - HTTP Request: GET https://upsampler-wan-2-2-14b-image-to-video.hf.space/gradio_api/heartbeat/4d77f488-714e-4915-9cff-2d9b70d64cdb "HTTP/1.1 200 OK"
+2026-09-18 20:22:17,977 - RakaBackend - INFO - HTTP Request: POST https://upsampler-wan-2-2-14b-image-to-video.hf.space/gradio_api/upload "HTTP/1.1 200 OK"
+2026-09-18 20:22:18,892 - RakaBackend - INFO - HTTP Request: POST https://upsampler-wan-2-2-14b-image-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 20:22:20,110 - RakaBackend - INFO - HTTP Request: GET https://upsampler-wan-2-2-14b-image-to-video.hf.space/gradio_api/queue/data?session_hash=4d77f488-714e-4915-9cff-2d9b70d64cdb "HTTP/1.1 200 OK"
+2026-09-18 20:22:20,162 - RakaBackend - ERROR - [I2V] ZERO_GPU_QUOTA on Upsampler/wan-2-2-14b-image-to-video: You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens...
+2026-09-18 20:22:20,162 - RakaBackend - INFO - [I2V] Attempting Shimti/shimti-ltx-video (ltx_i2v)...
+2026-09-18 20:22:20,537 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Shimti/shimti-ltx-video "HTTP/1.1 200 OK"
+2026-09-18 20:22:20,867 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Shimti/shimti-ltx-video/runtime "HTTP/1.1 200 OK"
+2026-09-18 20:22:21,903 - RakaBackend - INFO - HTTP Request: GET https://shimti-shimti-ltx-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 20:22:23,434 - RakaBackend - INFO - HTTP Request: GET https://shimti-shimti-ltx-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 20:22:24,058 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 20:22:24,720 - RakaBackend - INFO - HTTP Request: GET https://shimti-shimti-ltx-video.hf.space/gradio_api/heartbeat/fc64e01f-0fbd-42e8-8887-17f63d58da71 "HTTP/1.1 200 OK"
+2026-09-18 20:22:25,777 - RakaBackend - INFO - HTTP Request: POST https://shimti-shimti-ltx-video.hf.space/gradio_api/upload "HTTP/1.1 200 OK"
+2026-09-18 20:22:26,672 - RakaBackend - INFO - HTTP Request: POST https://shimti-shimti-ltx-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 20:22:27,871 - RakaBackend - INFO - HTTP Request: GET https://shimti-shimti-ltx-video.hf.space/gradio_api/queue/data?session_hash=fc64e01f-0fbd-42e8-8887-17f63d58da71 "HTTP/1.1 200 OK"
+2026-09-18 20:22:27,904 - RakaBackend - ERROR - [I2V] ZERO_GPU_QUOTA on Shimti/shimti-ltx-video: You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens...
+2026-09-18 20:22:27,904 - RakaBackend - INFO - [FALLBACK] Using Replicate Minimax as ultimate fallback...
+2026-09-18 20:25:02,740 - RakaBackend - INFO - [I2V] SUCCESS via REPLICATE: outputs\599f781c-a8fa-4be8-b1c4-e03dbd349854.mp4
+2026-09-18 23:06:52,320 - RakaBackend - INFO - [T2V] Attempting Lightricks/ltx-video-distilled (ltx)...
+2026-09-18 23:06:52,940 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled "HTTP/1.1 200 OK"
+2026-09-18 23:06:53,216 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled/runtime "HTTP/1.1 200 OK"
+2026-09-18 23:06:54,302 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/config "HTTP/1.1 200 OK"
+2026-09-18 23:06:56,437 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-18 23:06:57,367 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-18 23:06:57,936 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/heartbeat/5e50aed7-0660-476f-860a-c3d7e19ed3f2 "HTTP/1.1 200 OK"
+2026-09-18 23:06:57,937 - RakaBackend - INFO - HTTP Request: POST https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-18 23:06:58,939 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/data?session_hash=5e50aed7-0660-476f-860a-c3d7e19ed3f2 "HTTP/1.1 200 OK"
+2026-09-18 23:07:02,316 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/file=/tmp/gradio/bcf8b5f9b9b1fd111baa39446a8e667ac31a5722b95fa3e2b4f084d5f78feb27/output_17916.mp4 "HTTP/1.1 200 OK"
+2026-09-18 23:07:03,124 - RakaBackend - INFO - [T2V] Lightricks/ltx-video-distilled returned Type: <class 'tuple'> | Value: ({'video': 'C:\\Users\\Headway\\AppData\\Local\\Temp\\gradio\\ec798ec28599c65e8d3b1e6aaa89cfc8d3627e...
+2026-09-18 23:07:03,135 - RakaBackend - INFO - File verified and saved: outputs\cbc94a70-8b71-4c7a-b7d8-b08634a9da20.mp4 (139478 bytes)
+2026-09-18 23:07:03,135 - RakaBackend - INFO - [T2V] SUCCESS on Lightricks/ltx-video-distilled: outputs\cbc94a70-8b71-4c7a-b7d8-b08634a9da20.mp4
+2026-09-19 01:12:33,016 - RakaBackend - INFO - [T2V] Attempting Lightricks/ltx-video-distilled (ltx)...
+2026-09-19 01:12:33,713 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled "HTTP/1.1 200 OK"
+2026-09-19 01:12:34,019 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:12:35,643 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:12:37,230 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:12:38,068 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:12:38,668 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/heartbeat/a1bd073a-ce61-42df-ac21-184b8eb04607 "HTTP/1.1 200 OK"
+2026-09-19 01:12:38,676 - RakaBackend - INFO - HTTP Request: POST https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:12:39,629 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/data?session_hash=a1bd073a-ce61-42df-ac21-184b8eb04607 "HTTP/1.1 200 OK"
+2026-09-19 01:12:47,751 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/file=/tmp/gradio/9ecd890e999afb73b9221c82a865a6f43c845f8df12f26d040ec793bd86c1b44/output_81850.mp4 "HTTP/1.1 200 OK"
+2026-09-19 01:12:48,532 - RakaBackend - INFO - [T2V] Lightricks/ltx-video-distilled returned Type: <class 'tuple'> | Value: ({'video': 'C:\\Users\\Headway\\AppData\\Local\\Temp\\gradio\\2ebdde5161aa96c46ab533989f56430d2f4be1...
+2026-09-19 01:12:48,538 - RakaBackend - INFO - File verified and saved: outputs\b9223574-0ba5-4afb-92c4-032a15f2f41e.mp4 (155912 bytes)
+2026-09-19 01:12:48,539 - RakaBackend - INFO - [T2V] SUCCESS on Lightricks/ltx-video-distilled: outputs\b9223574-0ba5-4afb-92c4-032a15f2f41e.mp4
+2026-09-19 01:13:12,980 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-schnell "HTTP/1.1 200 OK"
+2026-09-19 01:13:13,242 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-schnell/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:13:14,130 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:13:15,186 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:13:15,436 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:13:15,976 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/heartbeat/8c8cbb98-2dc7-4709-a9b4-3299697e6afb "HTTP/1.1 200 OK"
+2026-09-19 01:13:16,006 - RakaBackend - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:13:16,771 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/data?session_hash=8c8cbb98-2dc7-4709-a9b4-3299697e6afb "HTTP/1.1 200 OK"
+2026-09-19 01:13:26,485 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/file=/tmp/gradio/0b74040bed1f826ea5482656e45d069354870a8e7a944f9064f14a7fc2f93e06/image.webp "HTTP/1.1 200 OK"
+2026-09-19 01:13:48,395 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-schnell "HTTP/1.1 200 OK"
+2026-09-19 01:13:48,700 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-schnell/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:13:49,562 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:13:50,615 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:13:50,894 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:13:51,467 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/heartbeat/63792e68-5dc8-4175-9f0b-a9203f5b0b63 "HTTP/1.1 200 OK"
+2026-09-19 01:13:51,468 - RakaBackend - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:13:52,359 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/data?session_hash=63792e68-5dc8-4175-9f0b-a9203f5b0b63 "HTTP/1.1 200 OK"
+2026-09-19 01:14:00,291 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/file=/tmp/gradio/cf41c797ca328306ea6cada823ed11f74b75ce8e1b09ed194b7190738e9cb49c/image.webp "HTTP/1.1 200 OK"
+2026-09-19 01:14:06,029 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-schnell "HTTP/1.1 200 OK"
+2026-09-19 01:14:06,294 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-schnell/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:14:07,147 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:14:08,435 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:14:08,716 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:14:09,227 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/heartbeat/326addc7-55ab-4daf-a689-b32cf522cd9c "HTTP/1.1 200 OK"
+2026-09-19 01:14:09,234 - RakaBackend - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:14:10,059 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/data?session_hash=326addc7-55ab-4daf-a689-b32cf522cd9c "HTTP/1.1 200 OK"
+2026-09-19 01:14:56,312 - RakaBackend - INFO - [I2V] Attempting Upsampler/wan-2-2-14b-image-to-video (wan22)...
+2026-09-19 01:14:56,680 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Upsampler/wan-2-2-14b-image-to-video "HTTP/1.1 200 OK"
+2026-09-19 01:14:56,941 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Upsampler/wan-2-2-14b-image-to-video/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:14:57,775 - RakaBackend - INFO - HTTP Request: GET https://upsampler-wan-2-2-14b-image-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:14:58,993 - RakaBackend - INFO - HTTP Request: GET https://upsampler-wan-2-2-14b-image-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:14:59,246 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:14:59,768 - RakaBackend - INFO - HTTP Request: GET https://upsampler-wan-2-2-14b-image-to-video.hf.space/gradio_api/heartbeat/5ec16689-9c4e-4b99-b4bb-509a3d31fdc8 "HTTP/1.1 200 OK"
+2026-09-19 01:15:03,660 - RakaBackend - INFO - HTTP Request: POST https://upsampler-wan-2-2-14b-image-to-video.hf.space/gradio_api/upload "HTTP/1.1 200 OK"
+2026-09-19 01:15:04,544 - RakaBackend - INFO - HTTP Request: POST https://upsampler-wan-2-2-14b-image-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:15:05,386 - RakaBackend - INFO - HTTP Request: GET https://upsampler-wan-2-2-14b-image-to-video.hf.space/gradio_api/queue/data?session_hash=5ec16689-9c4e-4b99-b4bb-509a3d31fdc8 "HTTP/1.1 200 OK"
+2026-09-19 01:15:05,409 - RakaBackend - ERROR - [I2V] ZERO_GPU_QUOTA on Upsampler/wan-2-2-14b-image-to-video: You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens...
+2026-09-19 01:15:05,410 - RakaBackend - INFO - [I2V] Attempting Shimti/shimti-ltx-video (ltx_i2v)...
+2026-09-19 01:15:05,866 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Shimti/shimti-ltx-video "HTTP/1.1 200 OK"
+2026-09-19 01:15:06,186 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Shimti/shimti-ltx-video/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:15:07,103 - RakaBackend - INFO - HTTP Request: GET https://shimti-shimti-ltx-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:15:08,634 - RakaBackend - INFO - HTTP Request: GET https://shimti-shimti-ltx-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:15:09,400 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:15:10,025 - RakaBackend - INFO - HTTP Request: GET https://shimti-shimti-ltx-video.hf.space/gradio_api/heartbeat/f208438b-0b20-4299-97d0-cb7c6e1556bd "HTTP/1.1 200 OK"
+2026-09-19 01:15:15,654 - RakaBackend - INFO - HTTP Request: POST https://shimti-shimti-ltx-video.hf.space/gradio_api/upload "HTTP/1.1 200 OK"
+2026-09-19 01:15:16,746 - RakaBackend - INFO - HTTP Request: POST https://shimti-shimti-ltx-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:15:17,519 - RakaBackend - INFO - HTTP Request: GET https://shimti-shimti-ltx-video.hf.space/gradio_api/queue/data?session_hash=f208438b-0b20-4299-97d0-cb7c6e1556bd "HTTP/1.1 200 OK"
+2026-09-19 01:15:17,531 - RakaBackend - ERROR - [I2V] ZERO_GPU_QUOTA on Shimti/shimti-ltx-video: You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens...
+2026-09-19 01:15:17,532 - RakaBackend - INFO - [FALLBACK] Using Replicate Minimax as ultimate fallback...
+2026-09-19 01:17:24,181 - RakaBackend - INFO - [I2V] SUCCESS via REPLICATE: outputs\476c5dfb-d696-4050-9705-d884ae82fbdf.mp4
+2026-09-19 01:19:24,742 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-schnell "HTTP/1.1 200 OK"
+2026-09-19 01:19:25,062 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-schnell/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:19:25,869 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:19:27,151 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:19:27,462 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:19:28,102 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/heartbeat/991f2e44-953f-4254-a0c6-429d4e5e51c2 "HTTP/1.1 200 OK"
+2026-09-19 01:19:28,102 - RakaBackend - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:19:28,947 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/data?session_hash=991f2e44-953f-4254-a0c6-429d4e5e51c2 "HTTP/1.1 200 OK"
+2026-09-19 01:20:51,093 - RakaBackend - INFO - [T2V] Attempting Lightricks/ltx-video-distilled (ltx)...
+2026-09-19 01:20:51,499 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled "HTTP/1.1 200 OK"
+2026-09-19 01:20:51,780 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:20:52,710 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:20:53,953 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:20:54,661 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:20:55,310 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/heartbeat/845ce44a-1ad0-4586-8b1b-7b00da500098 "HTTP/1.1 200 OK"
+2026-09-19 01:20:55,310 - RakaBackend - INFO - HTTP Request: POST https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:20:56,270 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/data?session_hash=845ce44a-1ad0-4586-8b1b-7b00da500098 "HTTP/1.1 200 OK"
+2026-09-19 01:20:56,280 - RakaBackend - ERROR - [T2V] ZERO_GPU_QUOTA on Lightricks/ltx-video-distilled: You have exceeded your ZeroGPU quota (120s requested vs. -60s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - htt...
+2026-09-19 01:20:56,280 - RakaBackend - INFO - [T2V] Attempting THUDM/CogVideoX-5B-Space (cogvideo)...
+2026-09-19 01:20:56,549 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/THUDM/CogVideoX-5B-Space "HTTP/1.1 307 Temporary Redirect"
+2026-09-19 01:20:56,815 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/zai-org/CogVideoX-5B-Space "HTTP/1.1 200 OK"
+2026-09-19 01:20:57,229 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/THUDM/CogVideoX-5B-Space/runtime "HTTP/1.1 307 Temporary Redirect"
+2026-09-19 01:20:57,509 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/zai-org/CogVideoX-5B-Space/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:20:58,502 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:21:00,380 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:21:00,910 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:21:01,510 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/heartbeat/fe7fa96a-c42c-4039-a76b-c37aa2c38b76 "HTTP/1.1 200 OK"
+2026-09-19 01:21:01,514 - RakaBackend - INFO - HTTP Request: POST https://zai-org-cogvideox-5b-space.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:21:02,316 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/queue/data?session_hash=fe7fa96a-c42c-4039-a76b-c37aa2c38b76 "HTTP/1.1 200 OK"
+2026-09-19 01:21:02,327 - RakaBackend - ERROR - [T2V] ZERO_GPU_QUOTA on THUDM/CogVideoX-5B-Space: You have exceeded your ZeroGPU quota (300s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https...
+2026-09-19 01:21:02,327 - RakaBackend - INFO - [T2V] Attempting mediasynthesismuseum/modelscope-text-to-video (modelscope)...
+2026-09-19 01:21:02,594 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/mediasynthesismuseum/modelscope-text-to-video "HTTP/1.1 200 OK"
+2026-09-19 01:21:02,991 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/mediasynthesismuseum/modelscope-text-to-video/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:21:03,834 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:21:04,834 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:21:05,085 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:21:05,579 - RakaBackend - INFO - HTTP Request: POST https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:21:05,634 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/heartbeat/3a748fb5-43b9-4dfa-a05c-aba44cba3b71 "HTTP/1.1 200 OK"
+2026-09-19 01:21:06,354 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/queue/data?session_hash=3a748fb5-43b9-4dfa-a05c-aba44cba3b71 "HTTP/1.1 200 OK"
+2026-09-19 01:21:06,397 - RakaBackend - ERROR - [T2V] ZERO_GPU_QUOTA on mediasynthesismuseum/modelscope-text-to-video: You have exceeded your ZeroGPU quota (90s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https:...
+2026-09-19 01:21:06,397 - RakaBackend - INFO - [T2V] Attempting liuyuyuil/Wanx2.1_Text_to_Video (wan21)...
+2026-09-19 01:21:06,660 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video "HTTP/1.1 200 OK"
+2026-09-19 01:21:06,935 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:21:07,763 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:21:08,757 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:21:09,070 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:21:09,553 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/heartbeat/f06afbee-3e89-47c8-9eb7-579671217b44 "HTTP/1.1 200 OK"
+2026-09-19 01:21:09,568 - RakaBackend - INFO - HTTP Request: POST https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:21:10,324 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/data?session_hash=f06afbee-3e89-47c8-9eb7-579671217b44 "HTTP/1.1 200 OK"
+2026-09-19 01:21:10,333 - RakaBackend - INFO - [T2V] liuyuyuil/Wanx2.1_Text_to_Video returned Type: <class 'NoneType'> | Value: None...
+2026-09-19 01:21:10,334 - RakaBackend - WARNING - [T2V] No valid video path extracted from liuyuyuil/Wanx2.1_Text_to_Video
+2026-09-19 01:21:10,335 - RakaBackend - INFO - [FALLBACK] Using Replicate Minimax as ultimate fallback...
+2026-09-19 01:24:05,681 - RakaBackend - INFO - [T2V] SUCCESS via REPLICATE: outputs\4b4ab4d5-14ed-4508-937d-b3ac2b57caa8.mp4
+2026-09-19 01:28:17,309 - RakaBackend - INFO - [T2V] Attempting Lightricks/ltx-video-distilled (ltx)...
+2026-09-19 01:28:17,724 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled "HTTP/1.1 200 OK"
+2026-09-19 01:28:17,987 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:28:18,944 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:28:20,503 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:28:21,063 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:28:21,653 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/heartbeat/2b3f0bd0-d2ae-4aca-ba38-bb7542a51722 "HTTP/1.1 200 OK"
+2026-09-19 01:28:21,674 - RakaBackend - INFO - HTTP Request: POST https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:28:22,496 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/data?session_hash=2b3f0bd0-d2ae-4aca-ba38-bb7542a51722 "HTTP/1.1 200 OK"
+2026-09-19 01:28:22,539 - RakaBackend - ERROR - [T2V] ZERO_GPU_QUOTA on Lightricks/ltx-video-distilled: You have exceeded your ZeroGPU quota (120s requested vs. -60s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - htt...
+2026-09-19 01:28:22,540 - RakaBackend - INFO - [T2V] Attempting THUDM/CogVideoX-5B-Space (cogvideo)...
+2026-09-19 01:28:22,817 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/THUDM/CogVideoX-5B-Space "HTTP/1.1 307 Temporary Redirect"
+2026-09-19 01:28:23,137 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/zai-org/CogVideoX-5B-Space "HTTP/1.1 200 OK"
+2026-09-19 01:28:23,457 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/THUDM/CogVideoX-5B-Space/runtime "HTTP/1.1 307 Temporary Redirect"
+2026-09-19 01:28:23,743 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/zai-org/CogVideoX-5B-Space/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:28:24,738 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:28:26,368 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:28:26,983 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:28:27,588 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/heartbeat/70810d8e-1532-44fb-97a3-cb19da64fe2a "HTTP/1.1 200 OK"
+2026-09-19 01:28:27,592 - RakaBackend - INFO - HTTP Request: POST https://zai-org-cogvideox-5b-space.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:28:28,450 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/queue/data?session_hash=70810d8e-1532-44fb-97a3-cb19da64fe2a "HTTP/1.1 200 OK"
+2026-09-19 01:28:28,457 - RakaBackend - ERROR - [T2V] ZERO_GPU_QUOTA on THUDM/CogVideoX-5B-Space: You have exceeded your ZeroGPU quota (300s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https...
+2026-09-19 01:28:28,457 - RakaBackend - INFO - [T2V] Attempting mediasynthesismuseum/modelscope-text-to-video (modelscope)...
+2026-09-19 01:28:28,737 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/mediasynthesismuseum/modelscope-text-to-video "HTTP/1.1 200 OK"
+2026-09-19 01:28:29,063 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/mediasynthesismuseum/modelscope-text-to-video/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:28:29,963 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:28:30,984 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:28:31,228 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:28:31,884 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/heartbeat/e8e84ac2-bbc7-42d3-9997-f15be32ae3db "HTTP/1.1 200 OK"
+2026-09-19 01:28:31,889 - RakaBackend - INFO - HTTP Request: POST https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:28:32,730 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/queue/data?session_hash=e8e84ac2-bbc7-42d3-9997-f15be32ae3db "HTTP/1.1 200 OK"
+2026-09-19 01:28:32,755 - RakaBackend - ERROR - [T2V] ZERO_GPU_QUOTA on mediasynthesismuseum/modelscope-text-to-video: You have exceeded your ZeroGPU quota (90s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https:...
+2026-09-19 01:28:32,756 - RakaBackend - INFO - [T2V] Attempting liuyuyuil/Wanx2.1_Text_to_Video (wan21)...
+2026-09-19 01:28:33,056 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video "HTTP/1.1 200 OK"
+2026-09-19 01:28:33,323 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/liuyuyuil/Wanx2.1_Text_to_Video/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:28:34,258 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:28:35,217 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:28:35,484 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:28:36,096 - RakaBackend - INFO - HTTP Request: POST https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:28:36,097 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/heartbeat/654c2e94-7fa6-433f-8eb6-e3625ddee81e "HTTP/1.1 200 OK"
+2026-09-19 01:28:36,883 - RakaBackend - INFO - HTTP Request: GET https://liuyuyuil-wanx2-1-text-to-video.hf.space/gradio_api/queue/data?session_hash=654c2e94-7fa6-433f-8eb6-e3625ddee81e "HTTP/1.1 200 OK"
+2026-09-19 01:28:36,913 - RakaBackend - INFO - [T2V] liuyuyuil/Wanx2.1_Text_to_Video returned Type: <class 'NoneType'> | Value: None...
+2026-09-19 01:28:36,913 - RakaBackend - WARNING - [T2V] No valid video path extracted from liuyuyuil/Wanx2.1_Text_to_Video
+2026-09-19 01:28:36,913 - RakaBackend - INFO - [FALLBACK] Using Replicate Minimax as ultimate fallback...
+2026-09-19 01:29:37,549 - RakaBackend - INFO - [IMAGE] New Request: A beautiful sunset, Realistic style, masterpiece, high resolution
+2026-09-19 01:29:37,550 - RakaBackend - INFO - [IMAGE] Attempting black-forest-labs/FLUX.1-schnell...
+2026-09-19 01:29:38,497 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-schnell "HTTP/1.1 200 OK"
+2026-09-19 01:29:38,767 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-schnell/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:29:39,776 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:29:41,062 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:29:41,337 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:29:42,016 - RakaBackend - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:29:42,016 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/heartbeat/ef088671-6ae8-4699-bb6f-ee01119c72b3 "HTTP/1.1 200 OK"
+2026-09-19 01:29:42,907 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/data?session_hash=ef088671-6ae8-4699-bb6f-ee01119c72b3 "HTTP/1.1 200 OK"
+2026-09-19 01:29:42,944 - RakaBackend - ERROR - [IMAGE] Candidate black-forest-labs/FLUX.1-schnell failed: You have exceeded your ZeroGPU quota (90s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https:
+2026-09-19 01:29:42,945 - RakaBackend - INFO - [IMAGE] Attempting black-forest-labs/FLUX.1-dev...
+2026-09-19 01:29:43,302 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-dev "HTTP/1.1 200 OK"
+2026-09-19 01:29:43,615 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-dev/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:29:44,582 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-dev.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:29:45,856 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-dev.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:29:46,176 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:29:46,817 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-dev.hf.space/gradio_api/heartbeat/5d0e0043-7f8e-4251-86a3-35b5e2874ae8 "HTTP/1.1 200 OK"
+2026-09-19 01:29:46,818 - RakaBackend - INFO - HTTP Request: POST https://black-forest-labs-flux-1-dev.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:29:47,753 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-dev.hf.space/gradio_api/queue/data?session_hash=5d0e0043-7f8e-4251-86a3-35b5e2874ae8 "HTTP/1.1 200 OK"
+2026-09-19 01:29:47,819 - RakaBackend - ERROR - [IMAGE] Candidate black-forest-labs/FLUX.1-dev failed: You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-19 01:29:47,819 - RakaBackend - INFO - [IMAGE] Attempting stabilityai/stable-diffusion-3.5-large...
+2026-09-19 01:29:48,093 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/stabilityai/stable-diffusion-3.5-large "HTTP/1.1 200 OK"
+2026-09-19 01:29:48,415 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/stabilityai/stable-diffusion-3.5-large/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:29:49,383 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:29:50,662 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:29:50,976 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:29:51,616 - RakaBackend - INFO - HTTP Request: POST https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:29:51,618 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/heartbeat/629b6e9b-8d9a-4a11-8c38-3d1e440a5b48 "HTTP/1.1 200 OK"
+2026-09-19 01:29:52,575 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/queue/data?session_hash=629b6e9b-8d9a-4a11-8c38-3d1e440a5b48 "HTTP/1.1 200 OK"
+2026-09-19 01:29:52,593 - RakaBackend - ERROR - [IMAGE] Candidate stabilityai/stable-diffusion-3.5-large failed: You have exceeded your ZeroGPU quota (65s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https:
+2026-09-19 01:43:25,788 - RakaBackend - INFO - [IMAGE] New Request: A digital art piece of a serene lake at night, Realistic style, masterpiece, high resolution
+2026-09-19 01:43:25,789 - RakaBackend - INFO - [IMAGE] Attempting black-forest-labs/FLUX.1-schnell...
+2026-09-19 01:43:27,290 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-schnell "HTTP/1.1 200 OK"
+2026-09-19 01:43:27,603 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-schnell/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:43:28,449 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:43:29,530 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:43:29,850 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:43:30,351 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/heartbeat/659a5e37-aa44-41b3-96a6-4515bffbc848 "HTTP/1.1 200 OK"
+2026-09-19 01:43:30,382 - RakaBackend - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:43:31,285 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/data?session_hash=659a5e37-aa44-41b3-96a6-4515bffbc848 "HTTP/1.1 200 OK"
+2026-09-19 01:43:31,298 - RakaBackend - ERROR - [IMAGE] Candidate black-forest-labs/FLUX.1-schnell failed: You have exceeded your ZeroGPU quota (90s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https:
+2026-09-19 01:43:31,298 - RakaBackend - INFO - [IMAGE] Attempting black-forest-labs/FLUX.1-dev...
+2026-09-19 01:43:31,580 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-dev "HTTP/1.1 200 OK"
+2026-09-19 01:43:31,932 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-dev/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:43:32,931 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-dev.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:43:34,271 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-dev.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:43:34,592 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:43:35,124 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-dev.hf.space/gradio_api/heartbeat/699883e9-7231-43d8-aadc-1dbf186aa47e "HTTP/1.1 200 OK"
+2026-09-19 01:43:35,125 - RakaBackend - INFO - HTTP Request: POST https://black-forest-labs-flux-1-dev.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:43:36,092 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-dev.hf.space/gradio_api/queue/data?session_hash=699883e9-7231-43d8-aadc-1dbf186aa47e "HTTP/1.1 200 OK"
+2026-09-19 01:43:36,115 - RakaBackend - ERROR - [IMAGE] Candidate black-forest-labs/FLUX.1-dev failed: You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-19 01:43:36,115 - RakaBackend - INFO - [IMAGE] Attempting stabilityai/stable-diffusion-3.5-large...
+2026-09-19 01:43:36,404 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/stabilityai/stable-diffusion-3.5-large "HTTP/1.1 200 OK"
+2026-09-19 01:43:36,670 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/stabilityai/stable-diffusion-3.5-large/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:43:37,671 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:43:38,964 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:43:39,230 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:43:39,714 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/heartbeat/5ccf91ea-3f9e-457c-ac00-a8580cea28d1 "HTTP/1.1 200 OK"
+2026-09-19 01:43:39,763 - RakaBackend - INFO - HTTP Request: POST https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:43:40,745 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/queue/data?session_hash=5ccf91ea-3f9e-457c-ac00-a8580cea28d1 "HTTP/1.1 200 OK"
+2026-09-19 01:43:40,787 - RakaBackend - ERROR - [IMAGE] Candidate stabilityai/stable-diffusion-3.5-large failed: You have exceeded your ZeroGPU quota (65s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https:
+2026-09-19 01:43:40,787 - RakaBackend - INFO - [IMAGE] Attempting stabilityai/stable-diffusion-3-medium...
+2026-09-19 01:43:41,055 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/stabilityai/stable-diffusion-3-medium "HTTP/1.1 200 OK"
+2026-09-19 01:43:41,363 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/stabilityai/stable-diffusion-3-medium/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:43:42,330 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-medium.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:43:43,603 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-medium.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:43:43,924 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:43:44,564 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-medium.hf.space/gradio_api/heartbeat/4ecface4-36b9-4d19-bd3b-4d5989a7883a "HTTP/1.1 200 OK"
+2026-09-19 01:43:44,564 - RakaBackend - INFO - HTTP Request: POST https://stabilityai-stable-diffusion-3-medium.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:43:45,491 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-medium.hf.space/gradio_api/queue/data?session_hash=4ecface4-36b9-4d19-bd3b-4d5989a7883a "HTTP/1.1 200 OK"
+2026-09-19 01:43:45,541 - RakaBackend - ERROR - [IMAGE] Candidate stabilityai/stable-diffusion-3-medium failed: You have exceeded your ZeroGPU quota (60s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https:
+2026-09-19 01:43:45,541 - RakaBackend - INFO - [IMAGE] Attempting black-forest-labs/flux-klein-9b-kv...
+2026-09-19 01:43:45,825 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/flux-klein-9b-kv "HTTP/1.1 200 OK"
+2026-09-19 01:43:46,087 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/flux-klein-9b-kv/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:43:46,964 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-klein-9b-kv.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:43:48,414 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-klein-9b-kv.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:43:48,643 - RakaBackend - ERROR - [IMAGE] Candidate black-forest-labs/flux-klein-9b-kv failed: Cannot find a function with `api_name`: /infer.
+2026-09-19 01:43:48,924 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:43:49,536 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-klein-9b-kv.hf.space/gradio_api/heartbeat/ee0bbd76-d059-43bb-ab10-8bc2a60e8ccf "HTTP/1.1 200 OK"
+2026-09-19 01:47:08,242 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled "HTTP/1.1 200 OK"
+2026-09-19 01:47:08,512 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/Lightricks/ltx-video-distilled/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:47:09,521 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:47:10,987 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:47:11,727 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:47:12,400 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/heartbeat/6d8aaf33-8cbb-4bf4-b777-6f5e13315328 "HTTP/1.1 200 OK"
+2026-09-19 01:47:12,401 - RakaBackend - INFO - HTTP Request: POST https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:47:13,198 - RakaBackend - INFO - HTTP Request: GET https://lightricks-ltx-video-distilled.hf.space/gradio_api/queue/data?session_hash=6d8aaf33-8cbb-4bf4-b777-6f5e13315328 "HTTP/1.1 200 OK"
+2026-09-19 01:47:13,520 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/THUDM/CogVideoX-5B-Space "HTTP/1.1 307 Temporary Redirect"
+2026-09-19 01:47:13,773 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/zai-org/CogVideoX-5B-Space "HTTP/1.1 200 OK"
+2026-09-19 01:47:14,160 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/THUDM/CogVideoX-5B-Space/runtime "HTTP/1.1 307 Temporary Redirect"
+2026-09-19 01:47:14,487 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/zai-org/CogVideoX-5B-Space/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:47:15,441 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:47:17,034 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:47:17,592 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:47:18,172 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/heartbeat/28da0c97-0112-4e06-8fbb-875a439a9bbd "HTTP/1.1 200 OK"
+2026-09-19 01:47:18,173 - RakaBackend - INFO - HTTP Request: POST https://zai-org-cogvideox-5b-space.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:47:18,967 - RakaBackend - INFO - HTTP Request: GET https://zai-org-cogvideox-5b-space.hf.space/gradio_api/queue/data?session_hash=28da0c97-0112-4e06-8fbb-875a439a9bbd "HTTP/1.1 200 OK"
+2026-09-19 01:47:19,280 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/mediasynthesismuseum/modelscope-text-to-video "HTTP/1.1 200 OK"
+2026-09-19 01:47:19,600 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/mediasynthesismuseum/modelscope-text-to-video/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:47:20,426 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:47:21,680 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:47:22,000 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:47:22,640 - RakaBackend - INFO - HTTP Request: POST https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:47:22,641 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/heartbeat/02a73754-2e5c-4e82-a50e-a1f3f5b86bd3 "HTTP/1.1 200 OK"
+2026-09-19 01:47:23,535 - RakaBackend - INFO - HTTP Request: GET https://mediasynthesismuseum-modelscope-text-to-video.hf.space/gradio_api/queue/data?session_hash=02a73754-2e5c-4e82-a50e-a1f3f5b86bd3 "HTTP/1.1 200 OK"
+2026-09-19 01:50:18,425 - RakaBackend - INFO - [IMAGE] New Request: A mystical glowing forest with neon mushrooms, 8k resolution, Cinematic style, masterpiece, high resolution
+2026-09-19 01:50:18,426 - RakaBackend - INFO - [IMAGE] Attempting black-forest-labs/FLUX.1-schnell...
+2026-09-19 01:50:18,835 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-schnell "HTTP/1.1 200 OK"
+2026-09-19 01:50:19,124 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-schnell/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:50:20,209 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:50:21,364 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:50:21,677 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:50:22,238 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/heartbeat/d0758bcd-dc14-4083-bcc0-b3dbdec886f0 "HTTP/1.1 200 OK"
+2026-09-19 01:50:22,264 - RakaBackend - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:50:23,277 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/data?session_hash=d0758bcd-dc14-4083-bcc0-b3dbdec886f0 "HTTP/1.1 200 OK"
+2026-09-19 01:50:23,292 - RakaBackend - ERROR - [IMAGE] Candidate black-forest-labs/FLUX.1-schnell failed: You have exceeded your ZeroGPU quota (90s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https:
+2026-09-19 01:50:23,293 - RakaBackend - INFO - [IMAGE] Attempting black-forest-labs/FLUX.1-dev...
+2026-09-19 01:50:23,569 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-dev "HTTP/1.1 200 OK"
+2026-09-19 01:50:23,917 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-dev/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:50:24,815 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-dev.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:50:25,997 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-dev.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:50:26,317 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:50:26,959 - RakaBackend - INFO - HTTP Request: POST https://black-forest-labs-flux-1-dev.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:50:26,960 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-dev.hf.space/gradio_api/heartbeat/a55ace96-7b98-478b-9497-e25ad57710b2 "HTTP/1.1 200 OK"
+2026-09-19 01:50:27,778 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-dev.hf.space/gradio_api/queue/data?session_hash=a55ace96-7b98-478b-9497-e25ad57710b2 "HTTP/1.1 200 OK"
+2026-09-19 01:50:27,783 - RakaBackend - ERROR - [IMAGE] Candidate black-forest-labs/FLUX.1-dev failed: You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-19 01:50:27,783 - RakaBackend - INFO - [IMAGE] Attempting stabilityai/stable-diffusion-3.5-large...
+2026-09-19 01:50:28,083 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/stabilityai/stable-diffusion-3.5-large "HTTP/1.1 200 OK"
+2026-09-19 01:50:28,396 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/stabilityai/stable-diffusion-3.5-large/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:50:29,665 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:50:30,637 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:50:30,957 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:50:31,538 - RakaBackend - INFO - HTTP Request: POST https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:50:31,550 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/heartbeat/899922e3-48f5-4d0d-ac9d-59edf40853bd "HTTP/1.1 200 OK"
+2026-09-19 01:50:32,397 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/queue/data?session_hash=899922e3-48f5-4d0d-ac9d-59edf40853bd "HTTP/1.1 200 OK"
+2026-09-19 01:50:33,304 - RakaBackend - INFO - HTTP Request: POST https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:50:34,099 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/queue/data?session_hash=899922e3-48f5-4d0d-ac9d-59edf40853bd "HTTP/1.1 200 OK"
+2026-09-19 01:50:34,116 - RakaBackend - ERROR - [IMAGE] Candidate stabilityai/stable-diffusion-3.5-large failed: You have exceeded your ZeroGPU quota (65s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https:
+2026-09-19 01:50:34,117 - RakaBackend - INFO - [IMAGE] Attempting stabilityai/stable-diffusion-3-medium...
+2026-09-19 01:50:34,484 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/stabilityai/stable-diffusion-3-medium "HTTP/1.1 200 OK"
+2026-09-19 01:50:34,804 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/stabilityai/stable-diffusion-3-medium/runtime "HTTP/1.1 200 OK"
+2026-09-19 01:50:35,757 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-medium.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 01:50:37,003 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-medium.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 01:50:37,334 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 01:50:37,753 - RakaBackend - INFO - HTTP Request: POST https://stabilityai-stable-diffusion-3-medium.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:50:37,765 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-medium.hf.space/gradio_api/heartbeat/b2abf2b3-c884-4ca0-a05a-45cd37924498 "HTTP/1.1 200 OK"
+2026-09-19 01:50:38,589 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-medium.hf.space/gradio_api/queue/data?session_hash=b2abf2b3-c884-4ca0-a05a-45cd37924498 "HTTP/1.1 200 OK"
+2026-09-19 01:50:39,418 - RakaBackend - INFO - HTTP Request: POST https://stabilityai-stable-diffusion-3-medium.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 01:50:40,397 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-medium.hf.space/gradio_api/queue/data?session_hash=b2abf2b3-c884-4ca0-a05a-45cd37924498 "HTTP/1.1 200 OK"
+2026-09-19 01:50:40,428 - RakaBackend - ERROR - [IMAGE] Candidate stabilityai/stable-diffusion-3-medium failed: You have exceeded your ZeroGPU quota (60s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https:
+2026-09-19 02:03:00,295 - RakaBackend - INFO - [IMAGE] New Request: A cybernetic cat with neon eyes, Realistic style, masterpiece, high resolution
+2026-09-19 02:03:00,297 - RakaBackend - INFO - [IMAGE] Attempting black-forest-labs/FLUX.1-schnell...
+2026-09-19 02:03:01,088 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-schnell "HTTP/1.1 200 OK"
+2026-09-19 02:03:01,357 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-schnell/runtime "HTTP/1.1 200 OK"
+2026-09-19 02:03:02,175 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 02:03:03,266 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 02:03:03,564 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 02:03:04,078 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/heartbeat/1a7f01d6-dc8c-4065-93d0-c3866f1347c7 "HTTP/1.1 200 OK"
+2026-09-19 02:03:04,102 - RakaBackend - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 02:03:04,949 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/data?session_hash=1a7f01d6-dc8c-4065-93d0-c3866f1347c7 "HTTP/1.1 200 OK"
+2026-09-19 02:03:04,974 - RakaBackend - ERROR - [IMAGE] Candidate black-forest-labs/FLUX.1-schnell failed: You have exceeded your ZeroGPU quota (90s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https:
+2026-09-19 02:03:04,975 - RakaBackend - INFO - [IMAGE] Attempting black-forest-labs/FLUX.1-dev...
+2026-09-19 02:03:05,238 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-dev "HTTP/1.1 200 OK"
+2026-09-19 02:03:05,500 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-dev/runtime "HTTP/1.1 200 OK"
+2026-09-19 02:03:06,382 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-dev.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 02:03:07,382 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-dev.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 02:03:07,757 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 02:03:08,269 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-dev.hf.space/gradio_api/heartbeat/2fe40fb2-6f13-4fa6-9917-62eb9008d42f "HTTP/1.1 200 OK"
+2026-09-19 02:03:08,270 - RakaBackend - INFO - HTTP Request: POST https://black-forest-labs-flux-1-dev.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 02:03:09,066 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-dev.hf.space/gradio_api/queue/data?session_hash=2fe40fb2-6f13-4fa6-9917-62eb9008d42f "HTTP/1.1 200 OK"
+2026-09-19 02:03:09,104 - RakaBackend - ERROR - [IMAGE] Candidate black-forest-labs/FLUX.1-dev failed: You have exceeded your ZeroGPU runs limit. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens
+2026-09-19 02:03:09,105 - RakaBackend - INFO - [IMAGE] Attempting stabilityai/stable-diffusion-3.5-large...
+2026-09-19 02:03:09,369 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/stabilityai/stable-diffusion-3.5-large "HTTP/1.1 200 OK"
+2026-09-19 02:03:09,672 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/stabilityai/stable-diffusion-3.5-large/runtime "HTTP/1.1 200 OK"
+2026-09-19 02:03:10,953 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 02:03:11,849 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 02:03:12,103 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 02:03:12,638 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/heartbeat/75f08f97-b230-4b30-bb09-1774af4b3313 "HTTP/1.1 200 OK"
+2026-09-19 02:03:12,766 - RakaBackend - INFO - HTTP Request: POST https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 02:03:13,666 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/queue/data?session_hash=75f08f97-b230-4b30-bb09-1774af4b3313 "HTTP/1.1 200 OK"
+2026-09-19 02:03:14,553 - RakaBackend - INFO - HTTP Request: POST https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 02:03:15,432 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/queue/data?session_hash=75f08f97-b230-4b30-bb09-1774af4b3313 "HTTP/1.1 200 OK"
+2026-09-19 02:03:15,466 - RakaBackend - ERROR - [IMAGE] Candidate stabilityai/stable-diffusion-3.5-large failed: You have exceeded your ZeroGPU quota (65s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https:
+2026-09-19 02:03:15,467 - RakaBackend - INFO - [IMAGE] Attempting stabilityai/stable-diffusion-3-medium...
+2026-09-19 02:03:15,742 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/stabilityai/stable-diffusion-3-medium "HTTP/1.1 200 OK"
+2026-09-19 02:03:16,066 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/stabilityai/stable-diffusion-3-medium/runtime "HTTP/1.1 200 OK"
+2026-09-19 02:03:17,033 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-medium.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 02:03:18,198 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-medium.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 02:03:18,466 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 02:03:18,964 - RakaBackend - INFO - HTTP Request: POST https://stabilityai-stable-diffusion-3-medium.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 02:03:18,971 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-medium.hf.space/gradio_api/heartbeat/3b1fcb78-b8ca-43e4-b4fc-4b51c68a14e9 "HTTP/1.1 200 OK"
+2026-09-19 02:03:19,753 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-medium.hf.space/gradio_api/queue/data?session_hash=3b1fcb78-b8ca-43e4-b4fc-4b51c68a14e9 "HTTP/1.1 200 OK"
+2026-09-19 02:03:20,673 - RakaBackend - INFO - HTTP Request: POST https://stabilityai-stable-diffusion-3-medium.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 02:03:21,638 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-medium.hf.space/gradio_api/queue/data?session_hash=3b1fcb78-b8ca-43e4-b4fc-4b51c68a14e9 "HTTP/1.1 200 OK"
+2026-09-19 02:03:21,684 - RakaBackend - ERROR - [IMAGE] Candidate stabilityai/stable-diffusion-3-medium failed: You have exceeded your ZeroGPU quota (60s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https:
+2026-09-19 02:03:21,684 - RakaBackend - INFO - [IMAGE] Attempting hysts/SDXL...
+2026-09-19 02:03:21,985 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/hysts/SDXL "HTTP/1.1 200 OK"
+2026-09-19 02:03:22,306 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/hysts/SDXL/runtime "HTTP/1.1 200 OK"
+2026-09-19 02:03:23,480 - RakaBackend - INFO - HTTP Request: GET https://hysts-sdxl.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 02:03:25,033 - RakaBackend - INFO - HTTP Request: GET https://hysts-sdxl.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 02:03:25,593 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 02:03:26,146 - RakaBackend - INFO - HTTP Request: GET https://hysts-sdxl.hf.space/gradio_api/heartbeat/e0f7a220-a497-40e7-aa9e-37fc8f0ed497 "HTTP/1.1 200 OK"
+2026-09-19 02:03:26,146 - RakaBackend - INFO - HTTP Request: POST https://hysts-sdxl.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 02:03:27,105 - RakaBackend - INFO - HTTP Request: GET https://hysts-sdxl.hf.space/gradio_api/queue/data?session_hash=e0f7a220-a497-40e7-aa9e-37fc8f0ed497 "HTTP/1.1 200 OK"
+2026-09-19 02:03:27,121 - RakaBackend - ERROR - [IMAGE] Candidate hysts/SDXL failed: You have exceeded your ZeroGPU quota (60s requested vs. 0s left). Try again in 0:00:00. Authenticate with a Hugging Face token for more quota - https:
+2026-09-19 02:19:19,468 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-schnell "HTTP/1.1 200 OK"
+2026-09-19 02:19:19,734 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-schnell/runtime "HTTP/1.1 200 OK"
+2026-09-19 02:19:20,859 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 02:19:22,135 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 02:19:22,415 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 02:19:22,963 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/heartbeat/f992af13-8230-4163-93a6-fa9e9374a7c1 "HTTP/1.1 200 OK"
+2026-09-19 02:19:22,986 - RakaBackend - INFO - HTTP Request: POST https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 02:19:23,892 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-schnell.hf.space/gradio_api/queue/data?session_hash=f992af13-8230-4163-93a6-fa9e9374a7c1 "HTTP/1.1 200 OK"
+2026-09-19 02:19:24,219 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-dev "HTTP/1.1 200 OK"
+2026-09-19 02:19:24,494 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/black-forest-labs/FLUX.1-dev/runtime "HTTP/1.1 200 OK"
+2026-09-19 02:19:25,464 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-dev.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 02:19:26,715 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-dev.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 02:19:26,969 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 02:19:27,519 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-dev.hf.space/gradio_api/heartbeat/ba2addbb-8cdb-4b94-a687-544a8fb67967 "HTTP/1.1 200 OK"
+2026-09-19 02:19:27,544 - RakaBackend - INFO - HTTP Request: POST https://black-forest-labs-flux-1-dev.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 02:19:28,532 - RakaBackend - INFO - HTTP Request: GET https://black-forest-labs-flux-1-dev.hf.space/gradio_api/queue/data?session_hash=ba2addbb-8cdb-4b94-a687-544a8fb67967 "HTTP/1.1 200 OK"
+2026-09-19 02:19:28,851 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/stabilityai/stable-diffusion-3.5-large "HTTP/1.1 200 OK"
+2026-09-19 02:19:29,172 - RakaBackend - INFO - HTTP Request: GET https://huggingface.co/api/spaces/stabilityai/stable-diffusion-3.5-large/runtime "HTTP/1.1 200 OK"
+2026-09-19 02:19:30,084 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/config "HTTP/1.1 200 OK"
+2026-09-19 02:19:31,252 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/info?serialize=False "HTTP/1.1 200 OK"
+2026-09-19 02:19:31,572 - RakaBackend - INFO - HTTP Request: HEAD https://huggingface.co/api/telemetry/py_client/initiated "HTTP/1.1 200 OK"
+2026-09-19 02:19:32,213 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/heartbeat/4a4da315-dfc9-4c00-ad37-0a62e9293fdd "HTTP/1.1 200 OK"
+2026-09-19 02:19:32,213 - RakaBackend - INFO - HTTP Request: POST https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/queue/join "HTTP/1.1 200 OK"
+2026-09-19 02:19:33,042 - RakaBackend - INFO - HTTP Request: GET https://stabilityai-stable-diffusion-3-5-large.hf.space/gradio_api/queue/data?session_hash=4a4da315-dfc9-4c00-ad37-0a62e9293fdd "HTTP/1.1 200 OK"
+2026-09-19 02:19:33,086 - RakaBackend - INFO - [IMAGE] Using Pollinations.ai fallback...
