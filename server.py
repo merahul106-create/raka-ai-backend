@@ -17,7 +17,7 @@ from huggingface_hub import InferenceClient
 from gradio_client import Client, handle_file
 
 # --- VERSIONING ---
-VERSION = "2.2.0-production-hardened-fallback"
+VERSION = "2.2.1-production-fallback-fixed"
 
 # --- PRODUCTION LOGGING ---
 logging.basicConfig(
@@ -605,6 +605,17 @@ def process_t2v_production_sync(job_id: str, prompt: str):
         logger.info(f"T2V_ATTEMPT | Job: {job_id} | Provider: {provider_id}")
         update_job(job_id, provider=provider_id, stage=f"Trying {provider_id}")
 
+        if cand["type"] == "wan21" and not DASHSCOPE_API_KEY:
+            logger.info(f"[T2V] Skipping {provider_id} because optional DASHSCOPE_API_KEY is unconfigured")
+            jobs[job_id]["attempts"].append({
+                "provider": provider_id,
+                "error": "Skipped optional provider",
+                "error_type": "MISSING_OPTIONAL_CREDENTIAL",
+                "details": "DASHSCOPE_API_KEY is not configured in environment"
+            })
+            save_jobs_to_disk()
+            continue
+
         result = run_t2v_gradio(prompt, cand, job_id)
 
         if isinstance(result, dict) and "error" in result:
@@ -678,6 +689,14 @@ def process_t2v_production_sync(job_id: str, prompt: str):
             "details": rep_result.get("details", "")[:250]
         })
         save_jobs_to_disk()
+    else:
+        jobs[job_id]["attempts"].append({
+            "provider": "Replicate/minimax",
+            "error": "Skipped optional provider",
+            "error_type": "MISSING_OPTIONAL_CREDENTIAL",
+            "details": "REPLICATE_API_KEY is not configured in environment"
+        })
+        save_jobs_to_disk()
 
     # 3. Try T2I2V Pipeline Fallback (Text -> Pollinations Ref Image -> Wan 2.2 Lightning I2V)
     provider_id = "T2I2V/Wan2.2-Lightning"
@@ -738,6 +757,17 @@ def process_i2v_production_sync(job_id: str, prompt: str, image_path: str):
         provider_id = f"HF/{cand['type']}"
         logger.info(f"I2V_ATTEMPT | Job: {job_id} | Provider: {provider_id}")
         update_job(job_id, provider=provider_id, stage=f"Trying {provider_id}")
+
+        if cand["type"] == "wan21" and not DASHSCOPE_API_KEY:
+            logger.info(f"[I2V] Skipping {provider_id} because optional DASHSCOPE_API_KEY is unconfigured")
+            jobs[job_id]["attempts"].append({
+                "provider": provider_id,
+                "error": "Skipped optional provider",
+                "error_type": "MISSING_OPTIONAL_CREDENTIAL",
+                "details": "DASHSCOPE_API_KEY is not configured in environment"
+            })
+            save_jobs_to_disk()
+            continue
 
         result = run_i2v_gradio(cand, prompt, image_path, job_id)
 
