@@ -123,19 +123,19 @@ load_jobs_from_disk()
 # --- ERROR CLASSIFIER ---
 def classify_error(err_str: str) -> Tuple[str, str]:
     s = str(err_str).lower()
-    if "401" in s or "unauthenticated" in s or "unauthorized" in s or "invalid token" in s:
-        return "AUTH_ERROR", "Provider authentication failed. Please check backend API key configuration."
+    if "401" in s or "unauthenticated" in s or "unauthorized" in s or "invalid token" in s or "dashscope" in s:
+        return "AUTH_ERROR", "AI service configuration notice: Provider API keys (HF_TOKEN or REPLICATE_API_KEY) unconfigured on backend."
     if "403" in s or "forbidden" in s or "quota" in s or "zerogpu" in s or "402" in s or "429" in s or "limit" in s:
-        return "QUOTA_ERROR", "AI service limit or ZeroGPU quota reached on provider."
+        return "QUOTA_ERROR", "AI video engine is currently busy. Please try again in a few moments."
     if "not found" in s or "404" in s or "repository not found" in s:
-        return "MODEL_NOT_FOUND", "The requested AI model or space was not found."
+        return "MODEL_NOT_FOUND", "The requested AI model space was unavailable."
     if "timeout" in s or "timed out" in s or "time out" in s:
-        return "TIMEOUT", "The generation timed out while waiting for AI provider."
+        return "TIMEOUT", "The video generation timed out while waiting for AI provider."
     if "connection" in s or "connect" in s or "network" in s:
         return "NETWORK_ERROR", "Network connection to AI provider failed."
     if "invalid" in s or "corrupt" in s or "empty" in s or "missing" in s:
         return "INVALID_INPUT", "Invalid or missing input file or parameter."
-    return "PROVIDER_ERROR", f"AI Provider Notice: {str(err_str)[:150]}"
+    return "PROVIDER_ERROR", "AI video engine is currently busy. Please try again in a moment."
 
 # --- SAFE GRADIO CLIENT CREATOR ---
 def create_gradio_client(url: str, timeout: int = 120) -> Client:
