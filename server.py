@@ -679,7 +679,42 @@ def process_t2v_production_sync(job_id: str, prompt: str):
         })
         save_jobs_to_disk()
 
-    # 3. Final Failure
+    # 3. Try T2I2V Pipeline Fallback (Text -> Pollinations Ref Image -> Wan 2.2 Lightning I2V)
+    provider_id = "T2I2V/Wan2.2-Lightning"
+    logger.info(f"T2V_ATTEMPT | Job: {job_id} | Provider: {provider_id}")
+    update_job(job_id, provider=provider_id, stage="Trying T2I2V Pipeline")
+    try:
+        ref_job_id = f"ref_{job_id}"
+        ref_img_url = run_pollinations_fallback(prompt, ref_job_id)
+        if ref_img_url:
+            local_ref_path = os.path.join(OUTPUT_DIR, f"{ref_job_id}.jpg")
+            if verify_file(local_ref_path):
+                wan22_cand = {
+                    "url": "https://saravutw-wan2-2-i2v-lightning-4-8step-custom.hf.space",
+                    "type": "wan22_lightning"
+                }
+                res = run_i2v_gradio(wan22_cand, prompt, local_ref_path, job_id)
+                if isinstance(res, tuple) or (isinstance(res, dict) and "error" not in res):
+                    normalized_path = normalize_provider_result(res, job_id, provider_id)
+                    if normalized_path:
+                        local_url = safe_save(normalized_path, job_id, ".mp4") if verify_file(normalized_path) else download_file(normalized_path, job_id)
+                        if local_url:
+                            logger.info(f"T2V_SUCCESS | Job: {job_id} | Provider: {provider_id}")
+                            update_job(
+                                job_id,
+                                status="completed",
+                                stage="Completed",
+                                video_url=local_url,
+                                url=local_url,
+                                result_url=local_url,
+                                provider=provider_id,
+                                progress=100
+                            )
+                            return
+    except Exception as e:
+        logger.warning(f"T2I2V Pipeline Exception for job {job_id}: {e}")
+
+    # 4. Final Failure
     last_err = jobs[job_id]["attempts"][-1] if jobs[job_id]["attempts"] else {"provider": "None", "error": "No providers available", "details": "All configured providers were busy or unavailable"}
     err_type, user_msg = classify_error(f"{last_err.get('error')} {last_err.get('details')}")
 
