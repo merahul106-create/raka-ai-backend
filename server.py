@@ -1,4 +1,4 @@
-﻿from fastapi import FastAPI, UploadFile, File, Form, BackgroundTasks, Request
+from fastapi import FastAPI, UploadFile, File, Form, BackgroundTasks, Request, Body
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -11,11 +11,13 @@ import logging
 import shutil
 import requests
 import base64
+import cv2
+from typing import Optional, Tuple
 from huggingface_hub import InferenceClient
 from gradio_client import Client, handle_file
 
 # --- VERSIONING ---
-VERSION = "2.0.0-production-auth-fixed"
+VERSION = "2.2.0-production-hardened-fallback"
 
 # --- PRODUCTION LOGGING ---
 logging.basicConfig(
@@ -37,24 +39,24 @@ app.add_middleware(
 
 OUTPUT_DIR = "outputs"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
+JOBS_DB_PATH = os.path.join(OUTPUT_DIR, "jobs_db.json")
 
 # Static files for serving generated media
 app.mount("/api/outputs", StaticFiles(directory=OUTPUT_DIR), name="outputs")
 
 # --- ENVIRONMENT CONFIG ---
-REPLICATE_API_KEY = os.getenv("REPLICATE_API_KEY") or "r8_8UHA1bKEwSXNOudUYXcep18keIY87Yd2gRW4F"
-# Production hardened token management
-p1 = ""
-p2 = ""
-HF_TOKEN = os.getenv("HF_TOKEN") or (p1 + p2)
+# Environment variables ONLY - NO hardcoded secrets
+REPLICATE_API_KEY = os.getenv("REPLICATE_API_KEY", "").strip()
+HF_TOKEN = os.getenv("HF_TOKEN", "").strip()
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+DASHSCOPE_API_KEY = os.getenv("DASHSCOPE_API_KEY", "").strip()
 
-# T2V Models (Gradio Spaces)
+# Provider Candidate Configuration
 T2V_CANDIDATES = [
     {"url": "Lightricks/ltx-video-distilled", "type": "ltx"},
     {"url": "Wan-AI/Wan2.1", "type": "wan21"},
 ]
 
-# I2V CANDIDATES
 I2V_CANDIDATES = [
     {
         "url": "https://saravutw-wan2-2-i2v-lightning-4-8step-custom.hf.space",
@@ -64,7 +66,6 @@ I2V_CANDIDATES = [
     {"url": "Wan-AI/Wan2.1", "type": "wan21"},
 ]
 
-# Image Gen candidates
 IMAGE_CANDIDATES = [
     {"url": "black-forest-labs/FLUX.1-schnell", "type": "flux_schnell"},
     {"url": "black-forest-labs/FLUX.1-dev", "type": "flux_dev"},
@@ -72,34 +73,91 @@ IMAGE_CANDIDATES = [
     {"url": "hysts/SDXL", "type": "sdxl"},
 ]
 
-# In-memory job store
+# Persistent Job Storage with disk fallback
 jobs = {}
 
-# --- PUBLIC ENDPOINTS ---
+def load_jobs_from_disk():
+    global jobs
+    if os.path.exists(JOBS_DB_PATH):
+        try:
+            with open(JOBS_DB_PATH, "r", encoding="utf-8") as f:
+                saved = json.load(f)
+                if isinstance(saved, dict):
+                    jobs.update(saved)
+                    logger.info(f"[JOB_DB] Loaded {len(saved)} jobs from disk")
+        except Exception as e:
+            logger.error(f"[JOB_DB] Failed to load jobs from disk: {e}")
 
-@app.get("/api/health")
-def health():
-    return {
-        "status": "ok",
-        "version": VERSION,
-        "timestamp": time.time(),
-        "environment": "production"
-    }
+def save_jobs_to_disk():
+    try:
+        with open(JOBS_DB_PATH, "w", encoding="utf-8") as f:
+            json.dump(jobs, f, indent=2)
+    except Exception as e:
+        logger.error(f"[JOB_DB] Failed to save jobs to disk: {e}")
 
-@app.get("/api/")
-def home():
-    return {
-        "app": "Raka AI",
-        "version": VERSION,
-        "status": "active"
-    }
+def update_job(job_id: str, **kwargs):
+    if job_id not in jobs:
+        jobs[job_id] = {
+            "job_id": job_id,
+            "status": "queued",
+            "stage": "Queued",
+            "provider": None,
+            "progress": 0,
+            "result_url": None,
+            "video_url": None,
+            "url": None,
+            "error": None,
+            "error_type": None,
+            "details": None,
+            "attempts": [],
+            "created_at": time.time(),
+            "updated_at": time.time()
+        }
+    jobs[job_id].update(kwargs)
+    jobs[job_id]["updated_at"] = time.time()
+    save_jobs_to_disk()
+
+# Initial load from disk
+load_jobs_from_disk()
+
+# --- ERROR CLASSIFIER ---
+def classify_error(err_str: str) -> Tuple[str, str]:
+    s = str(err_str).lower()
+    if "401" in s or "unauthenticated" in s or "unauthorized" in s or "invalid token" in s:
+        return "AUTH_ERROR", "Provider authentication failed. Please check backend API key configuration."
+    if "403" in s or "forbidden" in s or "quota" in s or "zerogpu" in s or "402" in s or "429" in s or "limit" in s:
+        return "QUOTA_ERROR", "AI service limit or ZeroGPU quota reached on provider."
+    if "not found" in s or "404" in s or "repository not found" in s:
+        return "MODEL_NOT_FOUND", "The requested AI model or space was not found."
+    if "timeout" in s or "timed out" in s or "time out" in s:
+        return "TIMEOUT", "The generation timed out while waiting for AI provider."
+    if "connection" in s or "connect" in s or "network" in s:
+        return "NETWORK_ERROR", "Network connection to AI provider failed."
+    if "invalid" in s or "corrupt" in s or "empty" in s or "missing" in s:
+        return "INVALID_INPUT", "Invalid or missing input file or parameter."
+    return "PROVIDER_ERROR", f"AI Provider Notice: {str(err_str)[:150]}"
+
+# --- SAFE GRADIO CLIENT CREATOR ---
+def create_gradio_client(url: str, timeout: int = 120) -> Client:
+    """
+    Safely creates a Gradio Client. Omits token parameter when HF_TOKEN is empty to avoid
+    generating 'Illegal header value b'Bearer '' errors.
+    """
+    if HF_TOKEN and HF_TOKEN.strip():
+        return Client(url, token=HF_TOKEN.strip(), httpx_kwargs={"timeout": timeout})
+    return Client(url, httpx_kwargs={"timeout": timeout})
+
+# --- SAFE AUTH HEADER HELPER ---
+def get_auth_headers(token: str, prefix: str = "Bearer") -> dict:
+    if not token or not token.strip():
+        return {}
+    return {"Authorization": f"{prefix} {token.strip()}"}
 
 # --- HELPERS ---
-
-def verify_file(path):
+def verify_file(path: str) -> bool:
     return os.path.exists(path) and os.path.getsize(path) > 0
 
-def safe_save(src_path, job_id, ext):
+def safe_save(src_path: str, job_id: str, ext: str) -> Optional[str]:
     dst_path = os.path.join(OUTPUT_DIR, f"{job_id}{ext}")
     try:
         shutil.copy(src_path, dst_path)
@@ -109,7 +167,7 @@ def safe_save(src_path, job_id, ext):
         logger.error(f"Storage error: {e}")
     return None
 
-def download_file(url, job_id, ext=".mp4"):
+def download_file(url: str, job_id: str, ext: str = ".mp4") -> Optional[str]:
     path = os.path.join(OUTPUT_DIR, f"{job_id}{ext}")
     try:
         with requests.get(url, stream=True, timeout=120) as r:
@@ -122,53 +180,124 @@ def download_file(url, job_id, ext=".mp4"):
         logger.error(f"Download failed: {e}")
     return None
 
-# --- AI ENGINES ---
+# --- GEMINI AI SERVICES ---
+def analyze_with_gemini(prompt_text: str, image_bytes: Optional[bytes] = None, mime_type: str = "image/jpeg") -> Optional[str]:
+    if not GEMINI_API_KEY:
+        logger.info("[GEMINI] GEMINI_API_KEY not configured in environment")
+        return None
 
-def run_replicate_t2v(prompt):
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={GEMINI_API_KEY}"
+
+    parts = [{"text": prompt_text}]
+    if image_bytes:
+        b64 = base64.b64encode(image_bytes).decode("utf-8")
+        parts.append({
+            "inline_data": {
+                "mime_type": mime_type,
+                "data": b64
+            }
+        })
+
+    payload = {"contents": [{"parts": parts}]}
+
+    try:
+        res = requests.post(url, json=payload, timeout=20)
+        if res.status_code == 200:
+            data = res.json()
+            candidates = data.get("candidates", [])
+            if candidates:
+                text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+                if text:
+                    logger.info("[GEMINI] Gemini Vision analysis succeeded")
+                    return text.strip()
+        else:
+            logger.warning(f"[GEMINI] Gemini API HTTP {res.status_code}: {res.text[:200]}")
+    except Exception as e:
+        logger.error(f"[GEMINI] Gemini API Exception: {e}")
+
+    return None
+
+# --- GRADIO VISION FALLBACK ---
+def analyze_image_gradio(image_path: str) -> Optional[dict]:
+    candidates = [
+        {"url": "fancyfeast/joy-caption-pre-alpha", "fn": "/stream_chat", "type": "joy"},
+        {"url": "tonyassi/blip-image-captioning-large", "fn": "/predict", "type": "blip"}
+    ]
+
+    last_error = ""
+    for cand in candidates:
+        try:
+            logger.info(f"[VISION_GRADIO] Attempting space: {cand['url']}")
+            client = create_gradio_client(cand["url"], timeout=30)
+            if cand["type"] == "joy":
+                result = client.predict(handle_file(image_path), api_name=cand["fn"])
+            else:
+                result = client.predict(handle_file(image_path), 20, 80, api_name=cand["fn"])
+
+            if result:
+                final_prompt = str(result)
+                if "⏱" in final_prompt:
+                    final_prompt = final_prompt.split("⏱")[0].strip()
+                if cand["type"] == "blip":
+                    final_prompt = f"A professional detailed photograph of {final_prompt.strip()}, cinematic lighting, highly detailed, 8k masterpiece"
+                return {"prompt": final_prompt, "provider": cand["url"]}
+        except Exception as e:
+            last_error = str(e)
+            logger.warning(f"[VISION_GRADIO] Space {cand['url']} failed: {last_error[:150]}")
+            continue
+
+    return None
+
+# --- REPLICATE SERVICES ---
+def run_replicate_t2v(prompt: str) -> dict:
+    if not REPLICATE_API_KEY:
+        logger.warning("[T2V] [Replicate] REPLICATE_API_KEY missing in environment")
+        return {"error": "Authentication Required", "details": "REPLICATE_API_KEY missing"}
+
     logger.info(f"[T2V] [Replicate] Starting minimax/video-01 | Prompt: {prompt[:50]}...")
     headers = {
         "Authorization": f"Bearer {REPLICATE_API_KEY}",
         "Content-Type": "application/json",
         "User-Agent": "RakaAI/1.0"
     }
+
     payload = {"input": {"prompt": prompt}}
 
     try:
-        # 1. Create Prediction
         res = requests.post(
             "https://api.replicate.com/v1/models/minimax/video-01/predictions",
             headers=headers,
             json=payload,
-            timeout=45
+            timeout=30
         )
 
-        logger.info(f"[T2V] [Replicate] Initial Response: {res.status_code}")
+        logger.info(f"[T2V] [Replicate] Initial Status: {res.status_code}")
+
+        if res.status_code in (401, 403):
+            logger.error(f"[T2V] [Replicate] Auth Error {res.status_code}: {res.text[:200]}")
+            return {"error": "Authentication Failed", "details": f"Replicate Auth Error HTTP {res.status_code}"}
 
         if res.status_code != 201:
             error_data = res.text
-            logger.error(f"[T2V] [Replicate] API Error: {res.status_code} - {error_data}")
-            return {"error": f"HTTP {res.status_code}", "details": error_data}
+            logger.error(f"[T2V] [Replicate] API Error: {res.status_code} - {error_data[:200]}")
+            return {"error": f"HTTP {res.status_code}", "details": error_data[:200]}
 
         prediction = res.json()
         p_id = prediction.get("id")
         p_url = prediction.get("urls", {}).get("get")
-        logger.info(f"[T2V] [Replicate] Job Created: {p_id}")
 
-        # 2. Poll for Completion
-        max_poll = 180 # 15 minutes max
-        for i in range(max_poll):
+        for i in range(36): # 3 minutes max
             time.sleep(5)
-            poll_res = requests.get(p_url, headers=headers, timeout=30)
+            poll_res = requests.get(p_url, headers=headers, timeout=15)
+
+            if poll_res.status_code in (401, 403):
+                return {"error": "Authentication Failed", "details": "Replicate Auth Error on poll"}
 
             if poll_res.status_code != 200:
-                logger.warning(f"[T2V] [Replicate] Poll Error: {poll_res.status_code}")
                 continue
 
             p = poll_res.json()
             status = p.get("status")
-
-            if i % 4 == 0:
-                logger.info(f"[T2V] [Replicate] Status ({p_id}): {status}")
 
             if status == "succeeded":
                 output = p.get("output")
@@ -177,19 +306,23 @@ def run_replicate_t2v(prompt):
 
             if status == "failed":
                 err = p.get("error", "Unknown error")
-                logger.error(f"[T2V] [Replicate] FAILED ({p_id}): {err}")
-                return {"error": "Generation Failed", "details": err}
+                logger.error(f"[T2V] [Replicate] FAILED: {err}")
+                return {"error": "Generation Failed", "details": str(err)}
 
             if status == "canceled":
                 return {"error": "Canceled", "details": "Job was canceled by provider"}
 
-        return {"error": "Timeout", "details": "Generation exceeded 15 minutes"}
+        return {"error": "Timeout", "details": "Replicate generation timed out after 3 minutes"}
 
     except Exception as e:
         logger.error(f"[T2V] [Replicate] Exception: {str(e)}")
         return {"error": "Exception", "details": str(e)}
 
-def run_replicate_i2v(prompt, image_path):
+def run_replicate_i2v(prompt: str, image_path: str) -> dict:
+    if not REPLICATE_API_KEY:
+        logger.warning("[I2V] [Replicate] REPLICATE_API_KEY missing in environment")
+        return {"error": "Authentication Required", "details": "REPLICATE_API_KEY missing"}
+
     logger.info(f"[I2V] [Replicate] Starting minimax/video-01 | Prompt: {prompt[:50]}...")
     headers = {
         "Authorization": f"Bearer {REPLICATE_API_KEY}",
@@ -202,9 +335,7 @@ def run_replicate_i2v(prompt, image_path):
             img_data = f.read()
 
         ext = os.path.splitext(image_path)[1].lower()
-        mime_type = "image/jpeg"
-        if ext == ".png": mime_type = "image/png"
-        elif ext == ".webp": mime_type = "image/webp"
+        mime_type = "image/png" if ext == ".png" else "image/jpeg"
 
         b64_encoded = base64.b64encode(img_data).decode("utf-8")
         data_uri = f"data:{mime_type};base64,{b64_encoded}"
@@ -214,41 +345,37 @@ def run_replicate_i2v(prompt, image_path):
             "first_frame_image": data_uri
         }}
 
-        # 1. Create Prediction
         res = requests.post(
             "https://api.replicate.com/v1/models/minimax/video-01/predictions",
             headers=headers,
             json=payload,
-            timeout=45
+            timeout=30
         )
 
-        logger.info(f"[I2V] [Replicate] Initial Response: {res.status_code}")
+        if res.status_code in (401, 403):
+            logger.error(f"[I2V] [Replicate] Auth Error {res.status_code}: {res.text[:200]}")
+            return {"error": "Authentication Failed", "details": f"Replicate Auth Error HTTP {res.status_code}"}
 
         if res.status_code != 201:
             error_data = res.text
-            logger.error(f"[I2V] [Replicate] API Error: {res.status_code} - {error_data}")
-            return {"error": f"HTTP {res.status_code}", "details": error_data}
+            return {"error": f"HTTP {res.status_code}", "details": error_data[:200]}
 
         prediction = res.json()
         p_id = prediction.get("id")
         p_url = prediction.get("urls", {}).get("get")
-        logger.info(f"[I2V] [Replicate] Job Created: {p_id}")
 
-        # 2. Poll for Completion
-        max_poll = 180 # 15 minutes max
-        for i in range(max_poll):
+        for i in range(36): # 3 minutes max
             time.sleep(5)
-            poll_res = requests.get(p_url, headers=headers, timeout=30)
+            poll_res = requests.get(p_url, headers=headers, timeout=15)
+
+            if poll_res.status_code in (401, 403):
+                return {"error": "Authentication Failed", "details": "Replicate Auth Error on poll"}
 
             if poll_res.status_code != 200:
-                logger.warning(f"[I2V] [Replicate] Poll Error: {poll_res.status_code}")
                 continue
 
             p = poll_res.json()
             status = p.get("status")
-
-            if i % 4 == 0:
-                logger.info(f"[I2V] [Replicate] Status ({p_id}): {status}")
 
             if status == "succeeded":
                 output = p.get("output")
@@ -257,30 +384,20 @@ def run_replicate_i2v(prompt, image_path):
 
             if status == "failed":
                 err = p.get("error", "Unknown error")
-                logger.error(f"[I2V] [Replicate] FAILED ({p_id}): {err}")
-                return {"error": "Generation Failed", "details": err}
+                return {"error": "Generation Failed", "details": str(err)}
 
             if status == "canceled":
                 return {"error": "Canceled", "details": "Job was canceled by provider"}
 
-        return {"error": "Timeout", "details": "Generation exceeded 15 minutes"}
+        return {"error": "Timeout", "details": "Replicate generation timed out after 3 minutes"}
 
     except Exception as e:
         logger.error(f"[I2V] [Replicate] Exception: {str(e)}")
         return {"error": "Exception", "details": str(e)}
 
-def normalize_provider_result(res, job_id, provider_name):
-    """
-    Safely extracts a local file path or remote URL from a Gradio/HuggingFace result object.
-    Logs the structure safely for debugging.
-    """
+# --- GRADIO HF HELPERS ---
+def normalize_provider_result(res, job_id: str, provider_name: str) -> Optional[str]:
     try:
-        # Safe stringification (avoiding large objects if any)
-        safe_res_repr = str(res)[:1000]
-        logger.info(f"T2V_WAN_RAW_RESULT_TYPE | Job: {job_id} | Provider: {provider_name} | Type: {type(res)}")
-        logger.info(f"T2V_WAN_RAW_RESULT_STRUCTURE | Job: {job_id} | Repr: {safe_res_repr}")
-        logger.info(f"T2V_WAN_EXTRACT_ATTEMPT | Job: {job_id} | Provider: {provider_name}")
-
         def search_result(obj):
             if isinstance(obj, str):
                 if obj.startswith("http://") or obj.startswith("https://"):
@@ -292,12 +409,10 @@ def normalize_provider_result(res, job_id, provider_name):
             elif hasattr(obj, "__fspath__"):
                 return os.fspath(obj)
             elif isinstance(obj, dict):
-                # Check known keys
                 for key in ["video", "path", "url", "file", "name", "data", "output", "value"]:
                     if key in obj and obj[key]:
                         sub = search_result(obj[key])
                         if sub: return sub
-                # If we couldn't find known keys, iterate all values
                 for v in obj.values():
                     sub = search_result(v)
                     if sub: return sub
@@ -307,26 +422,23 @@ def normalize_provider_result(res, job_id, provider_name):
                     if sub: return sub
             return None
 
-        extracted_path_or_url = search_result(res)
-
-        if extracted_path_or_url:
-            logger.info(f"T2V_WAN_EXTRACT_SUCCESS | Job: {job_id} | Provider: {provider_name} | Path: {extracted_path_or_url}")
-            return extracted_path_or_url
+        extracted = search_result(res)
+        if extracted:
+            logger.info(f"EXTRACT_SUCCESS | Job: {job_id} | Provider: {provider_name} | Path: {extracted}")
+            return extracted
         else:
-            logger.warning(f"T2V_WAN_EXTRACT_FAILED | Job: {job_id} | Provider: {provider_name} | Msg: Provider returned a result, but no usable video file/path/URL could be extracted.")
+            logger.warning(f"EXTRACT_FAILED | Job: {job_id} | Provider: {provider_name}")
             return None
-
     except Exception as e:
-        logger.error(f"T2V_WAN_EXTRACT_FAILED | Job: {job_id} | Provider: {provider_name} | Exception during normalization: {str(e)}")
+        logger.error(f"EXTRACT_EXCEPTION | Job: {job_id} | Provider: {provider_name} | Error: {e}")
         return None
 
-def run_t2v_gradio(prompt, candidate, job_id):
+def run_t2v_gradio(prompt: str, candidate: dict, job_id: str) -> dict:
     provider_name = f"HF-{candidate['type']}"
     logger.info(f"[T2V] [{provider_name}] Connecting to {candidate['url']}...")
 
     try:
-        # Increase timeout for video generation
-        client = Client(candidate["url"], token=HF_TOKEN, httpx_kwargs={"timeout": 600})
+        client = create_gradio_client(candidate["url"], timeout=120)
 
         if candidate["type"] == "ltx":
             logger.info(f"[T2V] [{provider_name}] Calling /text_to_video...")
@@ -350,6 +462,8 @@ def run_t2v_gradio(prompt, candidate, job_id):
             return res
 
         if candidate["type"] == "wan21":
+            if not DASHSCOPE_API_KEY:
+                return {"error": "Authentication Required", "details": "Wan2.1 requires DASHSCOPE_API_KEY"}
             logger.info(f"[T2V] [{provider_name}] Calling /t2v_generation_async...")
             res = client.predict(
                 prompt,
@@ -359,22 +473,16 @@ def run_t2v_gradio(prompt, candidate, job_id):
                 api_name="/t2v_generation_async"
             )
 
-            task_id = None
-            if isinstance(res, (list, tuple)) and len(res) > 0:
-                task_id = res[0]
-            elif isinstance(res, str):
-                task_id = res
-
+            task_id = res[0] if isinstance(res, (list, tuple)) and len(res) > 0 else (res if isinstance(res, str) else None)
             if not task_id:
-                return {"error": "Provider failed to return task_id", "details": str(res)[:500]}
+                return {"error": "Provider failed to return task_id", "details": str(res)[:200]}
 
-            for i in range(24): # 10 minutes max
+            for i in range(24): # 2 minutes max
                 time.sleep(5)
                 try:
                     status_res = client.predict(task_id, "t2v", False, api_name="/status_refresh")
                 except:
                     continue
-
                 video_obj = status_res[0] if isinstance(status_res, (list, tuple)) else status_res
                 if video_obj:
                     extracted = normalize_provider_result(video_obj, job_id, provider_name)
@@ -384,120 +492,25 @@ def run_t2v_gradio(prompt, candidate, job_id):
 
     except Exception as e:
         error_msg = str(e)
+        if "ZeroGPU" in error_msg or "quota" in error_msg.lower():
+            logger.warning(f"[T2V] [{provider_name}] ZeroGPU Quota Limit Reached")
+            return {"error": "ZeroGPU Quota Limit Reached", "details": error_msg[:200]}
         if "show_error=True" in error_msg:
-            error_msg = f"Provider Error (Gradio). Details: {error_msg.split('show_error=True')[0]}"
-        logger.warning(f"[T2V] [{provider_name}] FAILED: {error_msg}")
-        return {"error": "Provider Exception", "details": error_msg}
+            error_msg = f"Provider Internal Error. Details: {error_msg.split('show_error=True')[0]}"
+        logger.warning(f"[T2V] [{provider_name}] FAILED: {error_msg[:200]}")
+        return {"error": "Provider Exception", "details": error_msg[:200]}
 
     return {"error": "Unsupported Type", "details": candidate["type"]}
 
-def process_t2v_production_sync(job_id, prompt):
-    logger.info(f"T2V_WORKER_STARTED | Job: {job_id}")
-
-    # Use the same verified candidates as I2V where possible
-    for cand in T2V_CANDIDATES:
-        provider_id = f"HF/{cand['type']}"
-        logger.info(f"T2V_PROVIDER_ATTEMPT | Job: {job_id} | Provider: {provider_id}")
-
-        result = run_t2v_gradio(prompt, cand, job_id)
-
-        if isinstance(result, dict) and "error" in result:
-            jobs[job_id]["attempts"].append({
-                "provider": provider_id,
-                "error": result.get("error"),
-                "details": result.get("details", "")[:250]
-            })
-            continue
-
-        normalized_path = normalize_provider_result(result, job_id, provider_id)
-
-        if normalized_path:
-            if normalized_path.startswith("http://") or normalized_path.startswith("https://"):
-                local_url = download_file(normalized_path, job_id)
-                if local_url:
-                    logger.info(f"T2V_PROVIDER_SUCCESS | Job: {job_id} | Provider: {provider_id}")
-                    jobs[job_id]["status"] = "completed"
-                    jobs[job_id]["video_url"] = local_url
-                    jobs[job_id]["provider"] = provider_id
-                    jobs[job_id]["end_time"] = time.time()
-                    logger.info(f"T2V_JOB_COMPLETED | Job: {job_id} | URL: {local_url}")
-                    return
-            elif verify_file(normalized_path):
-                local_url = safe_save(normalized_path, job_id, ".mp4")
-                if local_url:
-                    logger.info(f"T2V_PROVIDER_SUCCESS | Job: {job_id} | Provider: {provider_id}")
-                    jobs[job_id]["status"] = "completed"
-                    jobs[job_id]["video_url"] = local_url
-                    jobs[job_id]["provider"] = provider_id
-                    jobs[job_id]["end_time"] = time.time()
-                    logger.info(f"T2V_JOB_COMPLETED | Job: {job_id} | URL: {local_url}")
-                    return
-
-        # Record failure and move to next
-        err_msg = "Extraction Failed" if not normalized_path else "File Verification Failed"
-        jobs[job_id]["attempts"].append({
-            "provider": provider_id,
-            "error": err_msg,
-            "details": f"Raw result: {str(result)[:250]}"
-        })
-
-    # Try Replicate Fallback
-    if REPLICATE_API_KEY:
-        provider_id = "Replicate/minimax"
-        logger.info(f"T2V_PROVIDER_ATTEMPT | Job: {job_id} | Provider: {provider_id} (HF Exhausted)")
-        rep_result = run_replicate_t2v(prompt)
-
-        if "url" in rep_result:
-            ext_url = rep_result["url"]
-            local_url = download_file(ext_url, job_id)
-            if local_url:
-                logger.info(f"T2V_PROVIDER_SUCCESS | Job: {job_id} | Provider: {provider_id}")
-                jobs[job_id]["status"] = "completed"
-                jobs[job_id]["video_url"] = local_url
-                jobs[job_id]["provider"] = provider_id
-                jobs[job_id]["end_time"] = time.time()
-                logger.info(f"T2V_JOB_COMPLETED | Job: {job_id} | URL: {local_url}")
-                return
-            else:
-                rep_result["error"] = "Download Failed"
-                rep_result["details"] = f"Could not download from {ext_url}"
-
-        logger.warning(f"T2V_PROVIDER_FAILED | Job: {job_id} | Provider: {provider_id} | Error: {rep_result.get('error')}")
-        jobs[job_id]["attempts"].append({
-            "provider": provider_id,
-            "error": rep_result.get("error"),
-            "details": rep_result.get("details", "")[:250]
-        })
-
-    # Final Failure
-    logger.error(f"T2V_JOB_FAILED | Job: {job_id} | Reason: ALL FREE MODELS FAILED")
-    jobs[job_id]["status"] = "failed"
-    jobs[job_id]["end_time"] = time.time()
-
-    if jobs[job_id]["attempts"]:
-        last_err = jobs[job_id]["attempts"][-1]
-        jobs[job_id]["provider"] = last_err['provider']
-        jobs[job_id]["error"] = f"Generation failed: {last_err['provider']}"
-        jobs[job_id]["details"] = f"Final Provider Error: {last_err['error']}"
-    else:
-        jobs[job_id]["provider"] = "None"
-        jobs[job_id]["error"] = "No providers available"
-        jobs[job_id]["details"] = "No attempts could be made"
-
-    jobs[job_id]["full_audit"] = jobs[job_id]["attempts"]
-
-def run_i2v(candidate, prompt, image_path, job_id):
+def run_i2v_gradio(candidate: dict, prompt: str, image_path: str, job_id: str) -> dict:
     provider_name = f"HF-{candidate['type']}"
     logger.info(f"[I2V] [{provider_name}] Connecting to {candidate['url']}...")
 
     try:
-        # Increase timeout for Wan2.2 Lightning to avoid 60s queue drop
-        timeout_val = 900 if candidate["type"] == "wan22_lightning" else 300
-        client = Client(candidate["url"], token=HF_TOKEN, httpx_kwargs={"timeout": timeout_val})
+        client = create_gradio_client(candidate["url"], timeout=120)
 
         if candidate["type"] == "wan22_lightning":
             logger.info(f"[I2V] [{provider_name}] Calling /generate_video...")
-
             res = client.predict(
                 handle_file(image_path),
                 handle_file(image_path),
@@ -517,60 +530,8 @@ def run_i2v(candidate, prompt, image_path, job_id):
                 True,
                 api_name="/generate_video"
             )
-
-            logger.info(
-                f"I2V_WAN22_RESPONSE | Job: {job_id} | "
-                f"Type: {type(res)} | Result: {str(res)[:500]}"
-            )
-
+            logger.info(f"[I2V] [{provider_name}] Response received")
             return res
-
-        if candidate["type"] == "wan21":
-            if not os.getenv("DASHSCOPE_API_KEY"):
-                logger.warning(f"I2V_WAN_SKIPPED | Job: {job_id} | Reason: DASHSCOPE_API_KEY not found in environment.")
-                return {"error": "Authentication Required", "details": "Wan2.1 I2V requires DASHSCOPE_API_KEY which is not set in the environment."}
-
-            logger.info(f"[I2V] [{provider_name}] Calling /i2v_generation_async...")
-            res = client.predict(
-                prompt,
-                handle_file(image_path),
-                False,
-                -1,
-                api_name="/i2v_generation_async"
-            )
-            logger.info(f"I2V_WAN_ASYNC_SUBMITTED | Raw Result Type: {type(res)}")
-
-            task_id = None
-            if isinstance(res, (list, tuple)) and len(res) > 0:
-                task_id = res[0]
-            elif isinstance(res, str):
-                task_id = res
-
-            if not task_id:
-                logger.error(f"I2V_WAN_EXTRACT_FAILED | Raw result: {res}")
-                return {"error": "Provider failed to return task_id", "details": str(res)[:500]}
-
-            logger.info(f"I2V_WAN_TASK_ID | Task ID: {task_id}")
-
-            for i in range(24): # 10 minutes max
-                logger.info(f"I2V_WAN_WAITING | Attempt: {i}")
-                time.sleep(5)
-                try:
-                    # status_refresh_1 inputs: task_id, task, status
-                    status_res = client.predict(task_id, "i2v", False, api_name="/status_refresh_1")
-                except Exception as e:
-                    logger.warning(f"I2V_WAN_WAITING | Status Refresh Exception: {e}")
-                    continue
-
-                video_obj = status_res[0] if isinstance(status_res, (list, tuple)) else status_res
-
-                if video_obj:
-                    extracted = normalize_provider_result(video_obj, "internal", provider_name)
-                    if extracted:
-                        logger.info(f"I2V_WAN_FINAL_RESULT | Result: {str(video_obj)[:200]}")
-                        return video_obj
-
-            return {"error": "Timeout", "details": "Wan2.1 polling timed out after 10 minutes."}
 
         if candidate["type"] == "ltx":
             logger.info(f"[I2V] [{provider_name}] Calling /image_to_video...")
@@ -593,32 +554,66 @@ def run_i2v(candidate, prompt, image_path, job_id):
             logger.info(f"[I2V] [{provider_name}] Response received")
             return res
 
+        if candidate["type"] == "wan21":
+            if not DASHSCOPE_API_KEY:
+                return {"error": "Authentication Required", "details": "Wan2.1 requires DASHSCOPE_API_KEY"}
+            logger.info(f"[I2V] [{provider_name}] Calling /i2v_generation_async...")
+            res = client.predict(
+                prompt,
+                handle_file(image_path),
+                False,
+                -1,
+                api_name="/i2v_generation_async"
+            )
+            task_id = res[0] if isinstance(res, (list, tuple)) and len(res) > 0 else (res if isinstance(res, str) else None)
+            if not task_id:
+                return {"error": "Provider failed to return task_id", "details": str(res)[:200]}
+
+            for i in range(24): # 2 minutes max
+                time.sleep(5)
+                try:
+                    status_res = client.predict(task_id, "i2v", False, api_name="/status_refresh_1")
+                except:
+                    continue
+                video_obj = status_res[0] if isinstance(status_res, (list, tuple)) else status_res
+                if video_obj:
+                    extracted = normalize_provider_result(video_obj, job_id, provider_name)
+                    if extracted:
+                        return video_obj
+            return {"error": "Timeout", "details": "Wan2.1 polling timed out"}
+
     except Exception as e:
         error_msg = str(e)
+        if "ZeroGPU" in error_msg or "quota" in error_msg.lower():
+            logger.warning(f"[I2V] [{provider_name}] ZeroGPU Quota Limit Reached")
+            return {"error": "ZeroGPU Quota Limit Reached", "details": error_msg[:200]}
         if "show_error=True" in error_msg:
-            error_msg = f"Provider Internal Error (Gradio Exception). Details: {error_msg.split('show_error=True')[0]}"
-        logger.warning(f"[I2V] [{provider_name}] FAILED: {error_msg}")
-        return {"error": "Provider Exception", "details": error_msg}
+            error_msg = f"Provider Internal Error. Details: {error_msg.split('show_error=True')[0]}"
+        logger.warning(f"[I2V] [{provider_name}] FAILED: {error_msg[:200]}")
+        return {"error": "Provider Exception", "details": error_msg[:200]}
 
     return {"error": "Unsupported Type", "details": candidate["type"]}
 
-def process_i2v_production_sync(job_id, prompt, image_path):
-    logger.info(f"I2V_WORKER_STARTED | Job: {job_id}")
+# --- WORKER SYNC EXECUTORS ---
+def process_t2v_production_sync(job_id: str, prompt: str):
+    logger.info(f"T2V_WORKER_STARTED | Job: {job_id}")
+    update_job(job_id, status="processing", stage="Generating Video")
 
-    for cand in I2V_CANDIDATES:
+    # 1. Try Hugging Face spaces
+    for cand in T2V_CANDIDATES:
         provider_id = f"HF/{cand['type']}"
-        logger.info(f"I2V_PROVIDER_ATTEMPT | Job: {job_id} | Provider: {provider_id}")
-        logger.info(f"I2V_PROVIDER_SUBMITTED | Job: {job_id} | Provider: {provider_id}")
+        logger.info(f"T2V_ATTEMPT | Job: {job_id} | Provider: {provider_id}")
+        update_job(job_id, provider=provider_id, stage=f"Trying {provider_id}")
 
-        result = run_i2v(cand, prompt, image_path, job_id)
+        result = run_t2v_gradio(prompt, cand, job_id)
 
         if isinstance(result, dict) and "error" in result:
-            logger.warning(f"I2V_PROVIDER_FAILED | Job: {job_id} | Provider: {provider_id} | Error: {result.get('error')}")
             jobs[job_id]["attempts"].append({
                 "provider": provider_id,
                 "error": result.get("error"),
                 "details": result.get("details", "")[:250]
             })
+            save_jobs_to_disk()
             continue
 
         normalized_path = normalize_provider_result(result, job_id, provider_id)
@@ -626,156 +621,238 @@ def process_i2v_production_sync(job_id, prompt, image_path):
         if normalized_path:
             if normalized_path.startswith("http://") or normalized_path.startswith("https://"):
                 local_url = download_file(normalized_path, job_id)
-                if local_url:
-                    logger.info(f"I2V_PROVIDER_SUCCESS | Job: {job_id} | Provider: {provider_id}")
-                    jobs[job_id]["status"] = "completed"
-                    jobs[job_id]["video_url"] = local_url
-                    jobs[job_id]["provider"] = provider_id
-                    jobs[job_id]["end_time"] = time.time()
-                    logger.info(f"I2V_JOB_COMPLETED | Job: {job_id} | URL: {local_url}")
-                    return
-                else:
-                    err_msg = "Download from URL failed"
-                    err_details = f"Failed to download from {normalized_path}"
             elif verify_file(normalized_path):
                 local_url = safe_save(normalized_path, job_id, ".mp4")
-                if local_url:
-                    logger.info(f"I2V_PROVIDER_SUCCESS | Job: {job_id} | Provider: {provider_id}")
-                    jobs[job_id]["status"] = "completed"
-                    jobs[job_id]["video_url"] = local_url
-                    jobs[job_id]["provider"] = provider_id
-                    jobs[job_id]["end_time"] = time.time()
-                    logger.info(f"I2V_JOB_COMPLETED | Job: {job_id} | URL: {local_url}")
-                    logger.info(f"I2V_FILE_SAVED | Job: {job_id} | Path: {local_url}")
-                    logger.info(f"I2V_VIDEO_URL | Job: {job_id} | URL: {local_url}")
-                    logger.info(f"I2V_FINAL_RESULT | Job: {job_id} | URL: {local_url}")
-                    return
-                else:
-                    err_msg = "File Verification Failed"
-                    err_details = f"Could not save local file {normalized_path}"
             else:
-                err_msg = "File Missing"
-                err_details = f"Result path {normalized_path} was missing or empty"
-        else:
-            err_msg = "Extraction Failed"
-            err_details = "Provider returned a result, but no usable video file/path/URL could be extracted."
+                local_url = None
 
-        logger.warning(f"I2V_PROVIDER_FAILED | Job: {job_id} | Provider: {provider_id} | Error: {err_msg}")
+            if local_url:
+                logger.info(f"T2V_SUCCESS | Job: {job_id} | Provider: {provider_id}")
+                update_job(
+                    job_id,
+                    status="completed",
+                    stage="Completed",
+                    video_url=local_url,
+                    url=local_url,
+                    result_url=local_url,
+                    provider=provider_id,
+                    progress=100
+                )
+                return
+
         jobs[job_id]["attempts"].append({
             "provider": provider_id,
-            "error": err_msg,
-            "details": err_details[:250]
+            "error": "Extraction/Verification Failed",
+            "details": f"Raw result: {str(result)[:200]}"
         })
+        save_jobs_to_disk()
 
     # 2. Try Replicate Fallback
-    provider_id = "Replicate/minimax"
-    logger.info(f"I2V_PROVIDER_ATTEMPT | Job: {job_id} | Provider: {provider_id} (HF Exhausted)")
-    rep_result = run_replicate_i2v(prompt, image_path)
+    if REPLICATE_API_KEY:
+        provider_id = "Replicate/minimax"
+        logger.info(f"T2V_ATTEMPT | Job: {job_id} | Provider: {provider_id} (HF Exhausted)")
+        update_job(job_id, provider=provider_id, stage="Trying Replicate/minimax")
 
-    if "url" in rep_result:
-        ext_url = rep_result["url"]
-        local_url = download_file(ext_url, job_id)
-        if local_url:
-            logger.info(f"I2V_PROVIDER_SUCCESS | Job: {job_id} | Provider: {provider_id}")
-            jobs[job_id]["status"] = "completed"
-            jobs[job_id]["video_url"] = local_url
-            jobs[job_id]["provider"] = provider_id
-            jobs[job_id]["end_time"] = time.time()
-            logger.info(f"I2V_JOB_COMPLETED | Job: {job_id} | URL: {local_url}")
-            return
-        else:
-            rep_result["error"] = "Download Failed"
-            rep_result["details"] = f"Could not download from {ext_url}"
+        rep_result = run_replicate_t2v(prompt)
 
-    logger.warning(f"I2V_PROVIDER_FAILED | Job: {job_id} | Provider: {provider_id} | Error: {rep_result.get('error')}")
-    jobs[job_id]["attempts"].append({
-        "provider": provider_id,
-        "error": rep_result.get("error"),
-        "details": rep_result.get("details", "")[:250]
-    })
+        if "url" in rep_result:
+            ext_url = rep_result["url"]
+            local_url = download_file(ext_url, job_id)
+            if local_url:
+                logger.info(f"T2V_SUCCESS | Job: {job_id} | Provider: {provider_id}")
+                update_job(
+                    job_id,
+                    status="completed",
+                    stage="Completed",
+                    video_url=local_url,
+                    url=local_url,
+                    result_url=local_url,
+                    provider=provider_id,
+                    progress=100
+                )
+                return
 
-    logger.error(f"I2V_JOB_FAILED | Job: {job_id} | Reason: ALL ENGINES FAILED")
-    jobs[job_id]["status"] = "failed"
-    jobs[job_id]["end_time"] = time.time()
+        jobs[job_id]["attempts"].append({
+            "provider": provider_id,
+            "error": rep_result.get("error", "Failed"),
+            "details": rep_result.get("details", "")[:250]
+        })
+        save_jobs_to_disk()
 
-    if jobs[job_id]["attempts"]:
-        last_err = jobs[job_id]["attempts"][-1]
-        jobs[job_id]["provider"] = last_err['provider']
-        jobs[job_id]["error"] = "No free I2V provider is currently available."
-        jobs[job_id]["details"] = f"Final Provider Error ({last_err['provider']}): {last_err['error']}"
-    else:
-        jobs[job_id]["provider"] = "None"
-        jobs[job_id]["error"] = "No free I2V provider is currently available."
-        jobs[job_id]["details"] = "No attempts could be made"
+    # 3. Final Failure
+    last_err = jobs[job_id]["attempts"][-1] if jobs[job_id]["attempts"] else {"provider": "None", "error": "No providers available", "details": "All configured providers were busy or unavailable"}
+    err_type, user_msg = classify_error(f"{last_err.get('error')} {last_err.get('details')}")
 
-    jobs[job_id]["full_audit"] = jobs[job_id]["attempts"]
+    logger.error(f"T2V_FAILED | Job: {job_id} | ErrorType: {err_type} | Details: {last_err.get('details')}")
+    update_job(
+        job_id,
+        status="failed",
+        stage="Failed",
+        error_type=err_type,
+        error=user_msg,
+        details=last_err.get("details", "All providers were busy or unreachable"),
+        provider=last_err.get("provider")
+    )
 
-async def process_t2v_production(job_id, prompt):
+def process_i2v_production_sync(job_id: str, prompt: str, image_path: str):
+    logger.info(f"I2V_WORKER_STARTED | Job: {job_id}")
+    update_job(job_id, status="processing", stage="Generating Video")
+
+    # 1. Try Hugging Face spaces
+    for cand in I2V_CANDIDATES:
+        provider_id = f"HF/{cand['type']}"
+        logger.info(f"I2V_ATTEMPT | Job: {job_id} | Provider: {provider_id}")
+        update_job(job_id, provider=provider_id, stage=f"Trying {provider_id}")
+
+        result = run_i2v_gradio(cand, prompt, image_path, job_id)
+
+        if isinstance(result, dict) and "error" in result:
+            jobs[job_id]["attempts"].append({
+                "provider": provider_id,
+                "error": result.get("error"),
+                "details": result.get("details", "")[:250]
+            })
+            save_jobs_to_disk()
+            continue
+
+        normalized_path = normalize_provider_result(result, job_id, provider_id)
+
+        if normalized_path:
+            if normalized_path.startswith("http://") or normalized_path.startswith("https://"):
+                local_url = download_file(normalized_path, job_id)
+            elif verify_file(normalized_path):
+                local_url = safe_save(normalized_path, job_id, ".mp4")
+            else:
+                local_url = None
+
+            if local_url:
+                logger.info(f"I2V_SUCCESS | Job: {job_id} | Provider: {provider_id}")
+                update_job(
+                    job_id,
+                    status="completed",
+                    stage="Completed",
+                    video_url=local_url,
+                    url=local_url,
+                    result_url=local_url,
+                    provider=provider_id,
+                    progress=100
+                )
+                return
+
+        jobs[job_id]["attempts"].append({
+            "provider": provider_id,
+            "error": "Extraction/Verification Failed",
+            "details": f"Raw result: {str(result)[:200]}"
+        })
+        save_jobs_to_disk()
+
+    # 2. Try Replicate Fallback
+    if REPLICATE_API_KEY:
+        provider_id = "Replicate/minimax"
+        logger.info(f"I2V_ATTEMPT | Job: {job_id} | Provider: {provider_id} (HF Exhausted)")
+        update_job(job_id, provider=provider_id, stage="Trying Replicate/minimax")
+
+        rep_result = run_replicate_i2v(prompt, image_path)
+
+        if "url" in rep_result:
+            ext_url = rep_result["url"]
+            local_url = download_file(ext_url, job_id)
+            if local_url:
+                logger.info(f"I2V_SUCCESS | Job: {job_id} | Provider: {provider_id}")
+                update_job(
+                    job_id,
+                    status="completed",
+                    stage="Completed",
+                    video_url=local_url,
+                    url=local_url,
+                    result_url=local_url,
+                    provider=provider_id,
+                    progress=100
+                )
+                return
+
+        jobs[job_id]["attempts"].append({
+            "provider": provider_id,
+            "error": rep_result.get("error", "Failed"),
+            "details": rep_result.get("details", "")[:250]
+        })
+        save_jobs_to_disk()
+
+    # 3. Final Failure
+    last_err = jobs[job_id]["attempts"][-1] if jobs[job_id]["attempts"] else {"provider": "None", "error": "No providers available", "details": "All configured providers were busy or unavailable"}
+    err_type, user_msg = classify_error(f"{last_err.get('error')} {last_err.get('details')}")
+
+    logger.error(f"I2V_FAILED | Job: {job_id} | ErrorType: {err_type} | Details: {last_err.get('details')}")
+    update_job(
+        job_id,
+        status="failed",
+        stage="Failed",
+        error_type=err_type,
+        error=user_msg,
+        details=last_err.get("details", "All providers were busy or unreachable"),
+        provider=last_err.get("provider")
+    )
+
+async def process_t2v_production(job_id: str, prompt: str):
     import asyncio
-    logger.info(f"T2V_JOB_CREATED | Job: {job_id} | Prompt: {prompt[:100]}")
-
-    if job_id not in jobs:
-        jobs[job_id] = {}
-
-    jobs[job_id]["status"] = "processing"
-    jobs[job_id]["attempts"] = []
-    jobs[job_id]["start_time"] = time.time()
-
+    logger.info(f"T2V_JOB_START | Job: {job_id}")
     try:
-        # Wrap the blocking sync function in a thread with a 15 minute overall timeout
         await asyncio.wait_for(
             asyncio.to_thread(process_t2v_production_sync, job_id, prompt),
-            timeout=900.0
+            timeout=300.0 # 5 minute overall timeout
         )
     except asyncio.TimeoutError:
-        logger.error(f"T2V_JOB_FAILED | Job: {job_id} | Reason: GLOBAL_TIMEOUT")
-        jobs[job_id]["status"] = "failed"
-        jobs[job_id]["error"] = "Generation timed out after 15 minutes."
-        jobs[job_id]["details"] = "The backend worker exceeded the maximum allowed time."
-        jobs[job_id]["full_audit"] = jobs[job_id].get("attempts", [])
-        jobs[job_id]["end_time"] = time.time()
+        logger.error(f"T2V_TIMEOUT | Job: {job_id}")
+        update_job(
+            job_id,
+            status="failed",
+            stage="Failed",
+            error_type="TIMEOUT",
+            error="Generation timed out after 5 minutes",
+            details="Worker timeout reached"
+        )
     except Exception as e:
-        logger.error(f"T2V_JOB_FAILED | Job: {job_id} | Reason: INTERNAL_ERROR | Msg: {str(e)}")
-        jobs[job_id]["status"] = "failed"
-        jobs[job_id]["error"] = "Internal Worker Error"
-        jobs[job_id]["details"] = str(e)
-        jobs[job_id]["full_audit"] = jobs[job_id].get("attempts", [])
-        jobs[job_id]["end_time"] = time.time()
+        logger.error(f"T2V_EXCEPTION | Job: {job_id} | Error: {e}")
+        update_job(
+            job_id,
+            status="failed",
+            stage="Failed",
+            error_type="PROVIDER_ERROR",
+            error="Internal Worker Error",
+            details=str(e)
+        )
 
-async def process_i2v_production(job_id, prompt, image_path):
+async def process_i2v_production(job_id: str, prompt: str, image_path: str):
     import asyncio
-    logger.info(f"I2V_JOB_CREATED | Job: {job_id} | Prompt: {prompt[:100]}")
-
-    if job_id not in jobs:
-        jobs[job_id] = {}
-
-    jobs[job_id]["status"] = "processing"
-    jobs[job_id]["attempts"] = []
-    jobs[job_id]["start_time"] = time.time()
-
+    logger.info(f"I2V_JOB_START | Job: {job_id}")
     try:
         await asyncio.wait_for(
             asyncio.to_thread(process_i2v_production_sync, job_id, prompt, image_path),
-            timeout=900.0
+            timeout=300.0 # 5 minute overall timeout
         )
     except asyncio.TimeoutError:
-        logger.error(f"I2V_JOB_FAILED | Job: {job_id} | Reason: GLOBAL_TIMEOUT")
-        jobs[job_id]["status"] = "failed"
-        jobs[job_id]["error"] = "Generation timed out after 15 minutes."
-        jobs[job_id]["details"] = "The backend worker exceeded the maximum allowed time."
-        jobs[job_id]["full_audit"] = jobs[job_id].get("attempts", [])
-        jobs[job_id]["end_time"] = time.time()
+        logger.error(f"I2V_TIMEOUT | Job: {job_id}")
+        update_job(
+            job_id,
+            status="failed",
+            stage="Failed",
+            error_type="TIMEOUT",
+            error="Generation timed out after 5 minutes",
+            details="Worker timeout reached"
+        )
     except Exception as e:
-        logger.error(f"I2V_JOB_FAILED | Job: {job_id} | Reason: INTERNAL_ERROR | Msg: {str(e)}")
-        jobs[job_id]["status"] = "failed"
-        jobs[job_id]["error"] = "Internal Worker Error"
-        jobs[job_id]["details"] = str(e)
-        jobs[job_id]["full_audit"] = jobs[job_id].get("attempts", [])
-        jobs[job_id]["end_time"] = time.time()
+        logger.error(f"I2V_EXCEPTION | Job: {job_id} | Error: {e}")
+        update_job(
+            job_id,
+            status="failed",
+            stage="Failed",
+            error_type="PROVIDER_ERROR",
+            error="Internal Worker Error",
+            details=str(e)
+        )
 
-# --- IMAGE LOGIC ---
-
-def run_pollinations_fallback(prompt, job_id):
+# --- IMAGE GENERATION LOGIC ---
+def run_pollinations_fallback(prompt: str, job_id: str) -> Optional[str]:
     logger.info("[IMAGE] Trying Pollinations fallback...")
     encoded = requests.utils.quote(prompt)
     url = f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=1024&nologo=true&model=flux"
@@ -783,15 +860,18 @@ def run_pollinations_fallback(prompt, job_id):
         res = requests.get(url, timeout=30)
         if res.status_code == 200:
             path = os.path.join(OUTPUT_DIR, f"{job_id}.jpg")
-            with open(path, "wb") as f: f.write(res.content)
+            with open(path, "wb") as f:
+                f.write(res.content)
             if verify_file(path):
                 return f"/api/outputs/{job_id}.jpg"
-    except: pass
+    except Exception as e:
+        logger.warning(f"[IMAGE] Pollinations Exception: {e}")
     return None
 
-def run_image_gen(cand, prompt):
-    client = Client(cand["url"])
-    if cand["type"] == "flux_schnell" or cand["type"] == "flux_dev":
+def run_image_gen_gradio(cand: dict, prompt: str) -> Optional[str]:
+    client = create_gradio_client(cand["url"], timeout=45)
+
+    if cand["type"] in ("flux_schnell", "flux_dev"):
         res = client.predict(prompt, 0, True, 1024, 1024, 4 if cand["type"] == "flux_schnell" else 28, api_name="/infer")
         return res[0].get("path") if (res and isinstance(res, (list, tuple))) else None
     if cand["type"] == "sd35":
@@ -802,78 +882,127 @@ def run_image_gen(cand, prompt):
         return res if isinstance(res, str) else None
     return None
 
+# --- PUBLIC ENDPOINTS ---
+
+@app.get("/api/health")
+def health():
+    return {
+        "status": "ok",
+        "version": VERSION,
+        "timestamp": time.time(),
+        "environment": "production",
+        "config": {
+            "HF_TOKEN_configured": bool(HF_TOKEN),
+            "REPLICATE_API_KEY_configured": bool(REPLICATE_API_KEY),
+            "GEMINI_API_KEY_configured": bool(GEMINI_API_KEY),
+            "DASHSCOPE_API_KEY_configured": bool(DASHSCOPE_API_KEY)
+        }
+    }
+
+@app.get("/api/")
+def home():
+    return {
+        "app": "Raka AI",
+        "version": VERSION,
+        "status": "active"
+    }
+
+# --- A. PROMPT -> IMAGE ---
 @app.post("/api/prompt-to-image")
-async def api_p2i(prompt: str = Form(...), style: str = Form("Realistic")):
+async def api_p2i(
+    request: Request,
+    prompt: Optional[str] = Form(None),
+    style: Optional[str] = Form("Realistic"),
+    body: Optional[dict] = Body(None)
+):
+    input_prompt = prompt or (body.get("prompt") if body else None)
+    input_style = style or (body.get("style", "Realistic") if body else "Realistic")
+
+    if not input_prompt:
+        return JSONResponse(status_code=400, content={"success": False, "error_type": "INVALID_INPUT", "error": "MISSING_PROMPT", "message": "Please enter a prompt"})
+
     job_id = str(uuid.uuid4())
-    final_prompt = f"{prompt}, {style} style, masterpiece, cinematic"
+    final_prompt = f"{input_prompt}, {input_style} style, masterpiece, cinematic"
     logger.info(f"[IMAGE] New Request: {final_prompt}")
 
-    # 1. Try HF candidates with retry logic
+    # 1. Try HF candidates
     for cand in IMAGE_CANDIDATES:
-        for attempt in range(3): # Max 3 attempts per candidate
-            try:
-                logger.info(f"[IMAGE] Attempt {attempt+1} on {cand['url']}")
-                temp = run_image_gen(cand, final_prompt)
-                if temp:
-                    url = safe_save(temp, job_id, ".webp")
-                    if url:
-                        logger.info(f"[IMAGE] SUCCESS on {cand['url']}")
-                        return {"success": True, "job_id": job_id, "url": url}
-                break # If successful but safe_save failed, or if provider returned None, move to next candidate
-            except Exception as e:
-                err_msg = str(e)
-                if "503" in err_msg or "busy" in err_msg.lower() or "Queue" in err_msg:
-                    wait_time = (attempt + 1) * 2
-                    logger.warning(f"[IMAGE] {cand['url']} busy (503), waiting {wait_time}s... ({err_msg[:100]})")
-                    time.sleep(wait_time)
-                    continue
-                else:
-                    logger.warning(f"[IMAGE] {cand['url']} failed: {e}")
-                    break # Critical error, try next candidate
+        try:
+            temp = run_image_gen_gradio(cand, final_prompt)
+            if temp and verify_file(temp):
+                local_url = safe_save(temp, job_id, ".webp")
+                if local_url:
+                    logger.info(f"[IMAGE] SUCCESS on {cand['url']}")
+                    return {"success": True, "job_id": job_id, "url": local_url, "result_url": local_url}
+        except Exception as e:
+            logger.warning(f"[IMAGE] {cand['url']} failed: {e}")
 
-    # 2. Try Pollinations (Always success if internet is on)
-    url = run_pollinations_fallback(final_prompt, job_id)
-    if url:
-        return {"success": True, "job_id": job_id, "url": url}
+    # 2. Try Pollinations (Always reliable)
+    local_url = run_pollinations_fallback(final_prompt, job_id)
+    if local_url:
+        return {"success": True, "job_id": job_id, "url": local_url, "result_url": local_url}
 
-    return JSONResponse(status_code=503, content={"success": False, "error": "IMAGE_QUOTA", "message": "All image engines are currently busy. Please try again in a moment."})
+    return JSONResponse(status_code=503, content={
+        "success": False,
+        "error_type": "QUOTA_ERROR",
+        "error": "IMAGE_QUOTA",
+        "message": "All image engines are currently busy. Please try again in a moment."
+    })
 
+# --- B. TEXT -> VIDEO ---
 @app.post("/api/text-to-video")
-async def api_t2v(background_tasks: BackgroundTasks, text: str = Form(...), style: str = Form("Realistic")):
+async def api_t2v(
+    background_tasks: BackgroundTasks,
+    text: Optional[str] = Form(None),
+    style: Optional[str] = Form("Realistic"),
+    body: Optional[dict] = Body(None)
+):
+    input_text = text or (body.get("text") or body.get("prompt") if body else None)
+    input_style = style or (body.get("style", "Realistic") if body else "Realistic")
+
+    if not input_text:
+        return JSONResponse(status_code=400, content={"success": False, "error_type": "INVALID_INPUT", "error": "MISSING_TEXT", "message": "Please enter text/prompt"})
+
     jid = str(uuid.uuid4())
-    final_prompt = f"{text}, {style} style"
-    jobs[jid] = {
-        "status": "queued",
-        "version": VERSION,
-        "full_audit": [],
-        "attempts": []
-    }
+    final_prompt = f"{input_text}, {input_style} style"
+    update_job(jid, status="queued", stage="Queued", prompt=final_prompt)
+
     background_tasks.add_task(process_t2v_production, jid, final_prompt)
     return {"success": True, "job_id": jid, "status": "queued", "version": VERSION}
 
+# --- C. PROMPT -> VIDEO ---
 @app.post("/api/prompt-to-video")
-async def api_p2v(background_tasks: BackgroundTasks, prompt: str = Form(...), style: str = Form("Realistic")):
+async def api_p2v(
+    background_tasks: BackgroundTasks,
+    prompt: Optional[str] = Form(None),
+    style: Optional[str] = Form("Realistic"),
+    body: Optional[dict] = Body(None)
+):
+    input_prompt = prompt or (body.get("prompt") or body.get("text") if body else None)
+    input_style = style or (body.get("style", "Realistic") if body else "Realistic")
+
+    if not input_prompt:
+        return JSONResponse(status_code=400, content={"success": False, "error_type": "INVALID_INPUT", "error": "MISSING_PROMPT", "message": "Please enter a prompt"})
+
     jid = str(uuid.uuid4())
-    final_prompt = f"{prompt}, {style} style"
-    jobs[jid] = {
-        "status": "queued",
-        "version": VERSION,
-        "full_audit": [],
-        "attempts": []
-    }
+    final_prompt = f"{input_prompt}, {input_style} style"
+    update_job(jid, status="queued", stage="Queued", prompt=final_prompt)
+
     background_tasks.add_task(process_t2v_production, jid, final_prompt)
     return {"success": True, "job_id": jid, "status": "queued", "version": VERSION}
 
+# --- D. IMAGE -> VIDEO ---
 @app.post("/api/image-to-video")
 async def api_i2v(
     background_tasks: BackgroundTasks,
     image: UploadFile = File(...),
-    prompt: str = Form(...),
-    style: str = Form("Realistic")
+    prompt: Optional[str] = Form("Cinematic motion"),
+    style: Optional[str] = Form("Realistic")
 ):
-    jid = str(uuid.uuid4())
+    if not image or not image.filename:
+        return JSONResponse(status_code=400, content={"success": False, "error_type": "INVALID_INPUT", "error": "MISSING_IMAGE", "message": "Image upload is required"})
 
-    # Save the uploaded image locally
+    jid = str(uuid.uuid4())
     ext = os.path.splitext(image.filename)[1]
     if not ext: ext = ".jpg"
     image_path = os.path.join(OUTPUT_DIR, f"input_{jid}{ext}")
@@ -881,130 +1010,22 @@ async def api_i2v(
     with open(image_path, "wb") as f:
         shutil.copyfileobj(image.file, f)
 
-    jobs[jid] = {
-        "status": "queued",
-        "version": VERSION,
-        "full_audit": [],
-        "attempts": []
-    }
+    if not verify_file(image_path):
+        return JSONResponse(status_code=400, content={"success": False, "error_type": "INVALID_INPUT", "error": "INVALID_IMAGE", "message": "Uploaded image file is empty or corrupted"})
 
     final_prompt = f"{prompt}, {style} style" if style else prompt
+    update_job(jid, status="queued", stage="Queued", prompt=final_prompt)
+
     background_tasks.add_task(process_i2v_production, jid, final_prompt, image_path)
     return {"success": True, "job_id": jid, "status": "queued", "version": VERSION}
 
-@app.get("/api/video-job/{job_id}")
-def get_api_job(job_id: str):
-    if job_id not in jobs:
-        return JSONResponse(status_code=404, content={"error": "Not found", "details": "Job ID not in memory. Server might have restarted."})
-    return jobs.get(job_id)
-
-import cv2
-
-def analyze_image_hf(image_path: str) -> dict:
-    # Use Gradio Space for high quality vision analysis
-    # Optimized for Raka AI generative prompts
-    try:
-        # primary: Joy Caption (Excellent for prompts)
-        # fallback: BLIP (Extremely reliable)
-        candidates = [
-            {"url": "fancyfeast/joy-caption-pre-alpha", "fn": "/stream_chat", "type": "joy"},
-            {"url": "tonyassi/blip-image-captioning-large", "fn": "/predict", "type": "blip"}
-        ]
-
-        last_error = ""
-        for cand in candidates:
-            try:
-                logger.info(f"VLM_GRADIO_ATTEMPT | Space: {cand['url']}")
-                client = Client(cand["url"], token=HF_TOKEN)
-                if cand["type"] == "joy":
-                    result = client.predict(
-                        handle_file(image_path),
-                        api_name=cand["fn"]
-                    )
-                else:
-                    # BLIP predict: image, min_tokens, max_tokens
-                    result = client.predict(
-                        handle_file(image_path),
-                        20,
-                        80,
-                        api_name=cand["fn"]
-                    )
-
-                if result:
-                    # If it's BLIP, wrap it to make it a better prompt
-                    final_prompt = result
-                    # Clean up BLIP metadata if present
-                    if "ΓÅ▒" in result:
-                        final_prompt = result.split("ΓÅ▒")[0].strip()
-
-                    if cand["type"] == "blip":
-                        final_prompt = f"A professional detailed photograph of {final_prompt.strip()}, cinematic lighting, highly detailed, 8k masterpiece"
-
-                    return {"success": True, "prompt": final_prompt, "provider": cand["url"]}
-            except Exception as e:
-                last_error = str(e)
-                logger.warning(f"VLM_GRADIO_FAILED | Space: {cand['url']} | Error: {last_error[:100]}")
-                continue
-
-        return {"success": False, "error_code": "PROVIDER_UNAVAILABLE", "message": f"Vision analysis unavailable. ({last_error[:50]})"}
-
-    except Exception as e:
-        return {"success": False, "error_code": "INTERNAL_ERROR", "message": str(e)}
-
-def analyze_video_hf(video_path: str) -> dict:
-    try:
-        cap = cv2.VideoCapture(video_path)
-        if not cap.isOpened():
-            return {"success": False, "error_code": "INVALID_INPUT", "message": "Could not open video file"}
-
-        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        if frame_count <= 0: frame_count = 60
-
-        # Use 3 frames to save time and prevent timeouts
-        indices = [int(frame_count * i) for i in [0.2, 0.5, 0.8]]
-        frames_paths = []
-
-        for idx in indices:
-            cap.set(cv2.CAP_PROP_POS_FRAMES, idx)
-            ret, frame = cap.read()
-            if ret:
-                f_path = os.path.join(OUTPUT_DIR, f"frame_{uuid.uuid4()}.jpg")
-                cv2.imwrite(f_path, frame)
-                frames_paths.append(f_path)
-
-        cap.release()
-
-        if not frames_paths:
-            return {"success": False, "error_code": "EXTRACTION_FAILED", "message": "Failed to extract frames"}
-
-        # Analyze frames sequentially
-        descriptions = []
-        for fp in frames_paths:
-            res = analyze_image_hf(fp)
-            if res.get("success"):
-                descriptions.append(res.get("prompt"))
-            if os.path.exists(fp): os.remove(fp)
-
-        if not descriptions:
-            return {"success": False, "error_code": "PROVIDER_UNAVAILABLE", "message": "Video frames analysis failed"}
-
-        # Combine descriptions into a coherent narrative
-        final_prompt = f"A cinematic video sequence. Beginning: {descriptions[0]}. Development: {descriptions[1]}. Ending: {descriptions[len(descriptions)-1]}."
-
-        return {
-            "success": True,
-            "prompt": final_prompt,
-            "provider": "RakaVision-Gradio-Ensemble"
-        }
-
-    except Exception as e:
-        return {"success": False, "error_code": "INTERNAL_ERROR", "message": str(e)}
-
+# --- E. IMAGE -> PROMPT ---
 @app.post("/api/image-to-prompt")
 async def api_image_to_prompt(image: UploadFile = File(...)):
-    jid = str(uuid.uuid4())
-    logger.info(f"I2P_JOB_CREATED | Job: {jid}")
+    if not image or not image.filename:
+        return JSONResponse(status_code=400, content={"success": False, "error_type": "INVALID_INPUT", "error": "MISSING_IMAGE", "message": "Image upload is required"})
 
+    jid = str(uuid.uuid4())
     ext = os.path.splitext(image.filename)[1]
     if not ext: ext = ".jpg"
     image_path = os.path.join(OUTPUT_DIR, f"input_i2p_{jid}{ext}")
@@ -1012,35 +1033,60 @@ async def api_image_to_prompt(image: UploadFile = File(...)):
     with open(image_path, "wb") as f:
         shutil.copyfileobj(image.file, f)
 
-    res = analyze_image_hf(image_path)
+    if not verify_file(image_path):
+        return JSONResponse(status_code=400, content={"success": False, "error_type": "INVALID_INPUT", "error": "INVALID_IMAGE", "message": "Uploaded image is empty or invalid"})
 
-    # Cleanup temp file
+    # 1. Try Gemini Vision API first
+    with open(image_path, "rb") as f:
+        img_bytes = f.read()
+
+    mime_type = "image/png" if ext.lower() == ".png" else "image/jpeg"
+    gemini_prompt = analyze_with_gemini(
+        "Describe this image in detail to serve as an AI generation prompt for video or photo creation.",
+        img_bytes,
+        mime_type
+    )
+
+    if gemini_prompt:
+        if os.path.exists(image_path): os.remove(image_path)
+        return {
+            "success": True,
+            "job_id": jid,
+            "prompt": gemini_prompt,
+            "provider": "Gemini-Flash-Vision"
+        }
+
+    # 2. Try Gradio Vision Fallback (Joy Caption / BLIP)
+    gradio_res = analyze_image_gradio(image_path)
+
+    # Cleanup temp upload file
     if os.path.exists(image_path):
         os.remove(image_path)
 
-    if not res.get("success"):
-        logger.error(f"I2P_JOB_FAILED | Job: {jid} | Error: {res.get('message')}")
-        status_code = 500
-        if res.get("error_code") == "AUTH_ERROR": status_code = 401
-        elif res.get("error_code") == "QUOTA_EXHAUSTED": status_code = 402
-        elif res.get("error_code") == "RATE_LIMIT": status_code = 429
-        elif res.get("error_code") == "PROVIDER_UNAVAILABLE": status_code = 503
-        return JSONResponse(status_code=status_code, content=res)
+    if gradio_res:
+        return {
+            "success": True,
+            "job_id": jid,
+            "prompt": gradio_res["prompt"],
+            "provider": gradio_res["provider"]
+        }
 
-    logger.info(f"I2P_JOB_COMPLETED | Job: {jid} | Provider: {res['provider']}")
-    return {
-        "success": True,
+    # 3. Final structured error if all vision models failed
+    return JSONResponse(status_code=503, content={
+        "success": False,
         "job_id": jid,
-        "prompt": res["prompt"],
-        "provider": res["provider"],
-        "model": res["provider"]
-    }
+        "error_type": "PROVIDER_ERROR",
+        "error": "VISION_ANALYSIS_FAILED",
+        "message": "Vision analysis unavailable across all configured providers"
+    })
 
+# --- F. VIDEO -> PROMPT ---
 @app.post("/api/video-to-prompt")
 async def api_video_to_prompt(video: UploadFile = File(...)):
-    jid = str(uuid.uuid4())
-    logger.info(f"V2P_JOB_CREATED | Job: {jid}")
+    if not video or not video.filename:
+        return JSONResponse(status_code=400, content={"success": False, "error_type": "INVALID_INPUT", "error": "MISSING_VIDEO", "message": "Video upload is required"})
 
+    jid = str(uuid.uuid4())
     ext = os.path.splitext(video.filename)[1]
     if not ext: ext = ".mp4"
     video_path = os.path.join(OUTPUT_DIR, f"input_v2p_{jid}{ext}")
@@ -1048,29 +1094,89 @@ async def api_video_to_prompt(video: UploadFile = File(...)):
     with open(video_path, "wb") as f:
         shutil.copyfileobj(video.file, f)
 
-    res = analyze_video_hf(video_path)
+    if not verify_file(video_path):
+        return JSONResponse(status_code=400, content={"success": False, "error_type": "INVALID_INPUT", "error": "INVALID_VIDEO", "message": "Uploaded video is empty or invalid"})
 
-    # Cleanup temp file
+    # Extract middle frame using OpenCV and analyze with Gemini or Gradio fallback
+    extracted_frame_path = os.path.join(OUTPUT_DIR, f"frame_{jid}.jpg")
+    frame_extracted = False
+    try:
+        cap = cv2.VideoCapture(video_path)
+        if cap.isOpened():
+            frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            mid_frame = max(0, frame_count // 2)
+            cap.set(cv2.CAP_PROP_POS_FRAMES, mid_frame)
+            ret, frame = cap.read()
+            if ret:
+                cv2.imwrite(extracted_frame_path, frame)
+                frame_extracted = verify_file(extracted_frame_path)
+        cap.release()
+    except Exception as e:
+        logger.error(f"[V2P] Frame extraction error: {e}")
+
+    # Cleanup temp video upload
     if os.path.exists(video_path):
         os.remove(video_path)
 
-    if not res.get("success"):
-        logger.error(f"V2P_JOB_FAILED | Job: {jid} | Error: {res.get('message')}")
-        status_code = 500
-        if res.get("error_code") == "AUTH_ERROR": status_code = 401
-        elif res.get("error_code") == "QUOTA_EXHAUSTED": status_code = 402
-        elif res.get("error_code") == "RATE_LIMIT": status_code = 429
-        elif res.get("error_code") == "PROVIDER_UNAVAILABLE": status_code = 503
-        return JSONResponse(status_code=status_code, content=res)
+    if not frame_extracted:
+        return JSONResponse(status_code=400, content={
+            "success": False,
+            "job_id": jid,
+            "error_type": "INVALID_INPUT",
+            "error": "FRAME_EXTRACTION_FAILED",
+            "message": "Could not extract valid video frame for analysis"
+        })
 
-    logger.info(f"V2P_JOB_COMPLETED | Job: {jid} | Provider: {res['provider']}")
-    return {
-        "success": True,
+    # 1. Analyze extracted frame with Gemini Vision
+    with open(extracted_frame_path, "rb") as f:
+        img_bytes = f.read()
+
+    gemini_prompt = analyze_with_gemini(
+        "Describe this video frame in detail to serve as a cinematic motion video prompt.",
+        img_bytes,
+        "image/jpeg"
+    )
+
+    if gemini_prompt:
+        if os.path.exists(extracted_frame_path): os.remove(extracted_frame_path)
+        return {
+            "success": True,
+            "job_id": jid,
+            "prompt": gemini_prompt,
+            "provider": "Gemini-Flash-VideoVision"
+        }
+
+    # 2. Try Gradio Vision Fallback (Joy Caption / BLIP)
+    gradio_res = analyze_image_gradio(extracted_frame_path)
+    if os.path.exists(extracted_frame_path): os.remove(extracted_frame_path)
+
+    if gradio_res:
+        return {
+            "success": True,
+            "job_id": jid,
+            "prompt": gradio_res["prompt"],
+            "provider": gradio_res["provider"]
+        }
+
+    # 3. Final structured error
+    return JSONResponse(status_code=503, content={
+        "success": False,
         "job_id": jid,
-        "prompt": res["prompt"],
-        "provider": res["provider"],
-        "model": res["provider"]
-    }
+        "error_type": "PROVIDER_ERROR",
+        "error": "VIDEO_ANALYSIS_FAILED",
+        "message": "Video analysis failed across all configured providers"
+    })
+
+# --- JOB STATUS ENDPOINT ---
+@app.get("/api/video-job/{job_id}")
+def get_api_job(job_id: str):
+    if job_id not in jobs:
+        load_jobs_from_disk()
+
+    if job_id not in jobs:
+        return JSONResponse(status_code=404, content={"success": False, "error_type": "MODEL_NOT_FOUND", "error": "NOT_FOUND", "message": "Job ID not found"})
+
+    return jobs.get(job_id)
 
 if __name__ == "__main__":
     import uvicorn
