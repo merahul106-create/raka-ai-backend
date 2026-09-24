@@ -220,15 +220,15 @@ def analyze_with_gemini(prompt_text: str, image_bytes: Optional[bytes] = None, m
 # --- GRADIO VISION FALLBACK ---
 def analyze_image_gradio(image_path: str) -> Optional[dict]:
     candidates = [
-        {"url": "fancyfeast/joy-caption-pre-alpha", "fn": "/stream_chat", "type": "joy"},
-        {"url": "tonyassi/blip-image-captioning-large", "fn": "/predict", "type": "blip"}
+        {"url": "tonyassi/blip-image-captioning-large", "fn": "/predict", "type": "blip"},
+        {"url": "fancyfeast/joy-caption-pre-alpha", "fn": "/stream_chat", "type": "joy"}
     ]
 
     last_error = ""
     for cand in candidates:
         try:
             logger.info(f"[VISION_GRADIO] Attempting space: {cand['url']}")
-            client = create_gradio_client(cand["url"], timeout=30)
+            client = create_gradio_client(cand["url"], timeout=10)
             if cand["type"] == "joy":
                 result = client.predict(handle_file(image_path), api_name=cand["fn"])
             else:
