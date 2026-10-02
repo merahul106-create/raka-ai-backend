@@ -52,8 +52,12 @@ app.mount("/api/outputs", StaticFiles(directory=OUTPUT_DIR), name="outputs")
 from dotenv import load_dotenv
 load_dotenv(override=False)
 
-REPLICATE_API_KEY = os.getenv("REPLICATE_API_KEY", "").strip()
-HF_TOKEN = os.getenv("HF_TOKEN", "").strip()
+def get_replicate_api_key() -> str:
+    return (os.getenv("REPLICATE_API_KEY") or "").strip()
+
+def get_hf_token() -> str:
+    return (os.getenv("HF_TOKEN") or "").strip()
+
 GEMINI_API_KEY = (os.getenv("GEMINI_API_KEY") or "").strip()
 DASHSCOPE_API_KEY = (os.getenv("DASHSCOPE_API_KEY") or "").strip()
 
@@ -67,8 +71,8 @@ class ProviderHealthState:
 
 class ProviderConfig:
     def __init__(self):
-        self.replicate_configured = bool(os.getenv("REPLICATE_API_KEY"))
-        self.hf_configured = bool(os.getenv("HF_TOKEN"))
+        self.replicate_configured = bool(get_replicate_api_key())
+        self.hf_configured = bool(get_hf_token())
         self.dashscope_configured = bool(DASHSCOPE_API_KEY)
         self.gemini_configured = bool(GEMINI_API_KEY)
         self.states = {
@@ -92,7 +96,7 @@ class ProviderConfig:
 provider_config = ProviderConfig()
 
 # --- STARTUP LOGGING ---
-logger.info(f"Replicate configured: {str(bool(os.getenv('REPLICATE_API_KEY'))).lower()}")
+logger.info(f"Replicate configured: {str(bool(get_replicate_api_key())).lower()}")
 logger.info(f"HuggingFace configured: {str(provider_config.hf_configured).lower()}")
 
 # --- BOUNDED EXPONENTIAL BACKOFF RETRY LOGIC ---
@@ -484,8 +488,9 @@ def create_gradio_client(url: str, timeout: int = 120) -> Client:
     Safely creates a Gradio Client. Omits token parameter when HF_TOKEN is empty to avoid
     generating 'Illegal header value b'Bearer '' errors.
     """
-    if HF_TOKEN and HF_TOKEN.strip():
-        return Client(url, token=HF_TOKEN.strip(), httpx_kwargs={"timeout": timeout})
+    token = get_hf_token()
+    if token:
+        return Client(url, token=token, httpx_kwargs={"timeout": timeout})
     return Client(url, httpx_kwargs={"timeout": timeout})
 
 # --- SAFE AUTH HEADER HELPER ---
@@ -682,14 +687,15 @@ def run_replicate_t2v(prompt: str) -> dict:
     return retry_with_backoff(_run_replicate_t2v_impl, prompt)
 
 def _run_replicate_t2v_impl(prompt: str) -> dict:
-    if not os.getenv("REPLICATE_API_KEY"):
+    api_key = get_replicate_api_key()
+    if not api_key:
         provider_config.update_state("replicate", "401 Missing API key")
         logger.warning("[T2V] [Replicate] REPLICATE_API_KEY missing in environment")
         return {"error": "Authentication Required", "details": "REPLICATE_API_KEY missing"}
 
     logger.info(f"[T2V] [Replicate] Starting minimax/video-01 | Prompt: {prompt[:50]}...")
     headers = {
-        "Authorization": f"Bearer {os.getenv('REPLICATE_API_KEY')}",
+        "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
         "User-Agent": "RakaAI/1.0"
     }
@@ -762,14 +768,15 @@ def run_replicate_i2v(prompt: str, image_path: str) -> dict:
     return retry_with_backoff(_run_replicate_i2v_impl, prompt, image_path)
 
 def _run_replicate_i2v_impl(prompt: str, image_path: str) -> dict:
-    if not os.getenv("REPLICATE_API_KEY"):
+    api_key = get_replicate_api_key()
+    if not api_key:
         provider_config.update_state("replicate", "401 Missing API key")
         logger.warning("[I2V] [Replicate] REPLICATE_API_KEY missing in environment")
         return {"error": "Authentication Required", "details": "REPLICATE_API_KEY missing"}
 
     logger.info(f"[I2V] [Replicate] Starting minimax/video-01 | Prompt: {prompt[:50]}...")
     headers = {
-        "Authorization": f"Bearer {os.getenv('REPLICATE_API_KEY')}",
+        "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
         "User-Agent": "RakaAI/1.0"
     }
@@ -1134,7 +1141,7 @@ def process_t2v_production_sync(job_id: str, prompt: str):
         save_jobs_to_disk()
 
     # 2. Try Replicate Fallback
-    if os.getenv("REPLICATE_API_KEY"):
+    if get_replicate_api_key():
         provider_id = "Replicate/minimax"
         logger.info(f"T2V_ATTEMPT | Job: {job_id} | Provider: {provider_id} (HF Exhausted)")
         update_job(job_id, provider=provider_id, stage="Trying Replicate/minimax")
@@ -1317,7 +1324,7 @@ def process_i2v_production_sync(job_id: str, prompt: str, image_path: str):
         save_jobs_to_disk()
 
     # 2. Try Replicate Fallback
-    if os.getenv("REPLICATE_API_KEY"):
+    if get_replicate_api_key():
         provider_id = "Replicate/minimax"
         logger.info(f"I2V_ATTEMPT | Job: {job_id} | Provider: {provider_id} (HF Exhausted)")
         update_job(job_id, provider=provider_id, stage="Trying Replicate/minimax")
@@ -1483,12 +1490,12 @@ def health():
         "version": VERSION,
         "timestamp": time.time(),
         "environment": "production",
-        "replicate_configured": bool(os.getenv("REPLICATE_API_KEY")),
-        "hf_configured": provider_config.hf_configured,
+        "replicate_configured": bool(get_replicate_api_key()),
+        "hf_configured": bool(get_hf_token()),
         "provider_status": provider_config.states,
         "config": {
-            "HF_TOKEN_configured": provider_config.hf_configured,
-            "REPLICATE_API_KEY_configured": bool(os.getenv("REPLICATE_API_KEY")),
+            "HF_TOKEN_configured": bool(get_hf_token()),
+            "REPLICATE_API_KEY_configured": bool(get_replicate_api_key()),
             "GEMINI_API_KEY_configured": bool(GEMINI_API_KEY),
             "DASHSCOPE_API_KEY_configured": bool(DASHSCOPE_API_KEY)
         }
