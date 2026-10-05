@@ -1410,54 +1410,6 @@ async def process_i2v_production(job_id: str, prompt: str, image_path: str):
             details="The video generation process timed out. Please try again.",
             progress=0
         )
-
-def run_image_motion_video_engine(image_path: str, prompt: str, job_id: str) -> Optional[str]:
-    logger.info(f"[I2V_MOTION_ENGINE] Animating user uploaded image {image_path}...")
-    try:
-        if not verify_file(image_path):
-            return None
-
-        img = cv2.imread(image_path)
-        if img is None:
-            return None
-
-        h, w, _ = img.shape
-        target_w = max(256, (w // 16) * 16)
-        target_h = max(256, (h // 16) * 16)
-
-        img = cv2.resize(img, (target_w, target_h), interpolation=cv2.INTER_LANCZOS4)
-
-        num_frames = 45
-        frames = []
-
-        for i in range(num_frames):
-            progress = i / float(num_frames)
-            shift_x = int(math.sin(progress * math.pi) * (target_w * 0.04))
-            shift_y = int(math.cos(progress * math.pi) * (target_h * 0.03))
-            scale = 1.0 + math.sin(progress * math.pi) * 0.06
-
-            M = np.float32([
-                [scale, 0, (1 - scale) * target_w / 2 + shift_x],
-                [0, scale, (1 - scale) * target_h / 2 + shift_y]
-            ])
-
-            frame = cv2.warpAffine(img, M, (target_w, target_h), borderMode=cv2.BORDER_REFLECT)
-            frames.append(frame)
-
-        output_path = os.path.join(OUTPUT_DIR, f"{job_id}.mp4")
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter(output_path, fourcc, 15, (target_w, target_h))
-
-        for f in frames:
-            out.write(f)
-        out.release()
-
-        if verify_file(output_path):
-            logger.info(f"[I2V_MOTION_ENGINE] SUCCESS -> /api/outputs/{job_id}.mp4")
-            return f"/api/outputs/{job_id}.mp4"
-    except Exception as e:
-        logger.warning(f"[I2V_MOTION_ENGINE] Exception: {e}")
-    return None
     logger.info(f"[FAST_VIDEO_ENGINE] Generating 5-second fast video fallback for {job_id}...")
     try:
         encoded = requests.utils.quote(prompt)
