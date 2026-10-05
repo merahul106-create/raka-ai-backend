@@ -1362,19 +1362,19 @@ def process_i2v_production_sync(job_id: str, prompt: str, image_path: str):
                 )
                 return
 
-    # 3. Fallback: Fast Pollinations I2V Engine (Guaranteed 100% Success Animation)
-    logger.info(f"I2V_POLLINATIONS_FALLBACK | Job: {job_id} | Animating uploaded image")
-    pol_url = run_pollinations_i2v_engine(prompt, image_path, job_id)
-    if pol_url:
-        logger.info(f"I2V_SUCCESS | Job: {job_id} | Provider: Pollinations/I2V")
+    # 3. Fallback: Exact User Image Motion Engine (100% Same Image Guarantee)
+    logger.info(f"I2V_EXACT_FALLBACK | Job: {job_id} | Animating exact uploaded image")
+    exact_url = run_exact_image_motion_engine(prompt, image_path, job_id)
+    if exact_url:
+        logger.info(f"I2V_SUCCESS | Job: {job_id} | Provider: ExactImage/MotionEngine")
         update_job(
             job_id,
             status="completed",
             stage="Completed",
-            video_url=pol_url,
-            url=pol_url,
-            result_url=pol_url,
-            provider="Pollinations/I2V",
+            video_url=exact_url,
+            url=exact_url,
+            result_url=exact_url,
+            provider="ExactImage/MotionEngine",
             progress=100
         )
         return
@@ -1601,8 +1601,8 @@ def home():
         "status": "active"
     }
 
-def run_pollinations_i2v_engine(prompt: str, image_path: str, job_id: str) -> Optional[str]:
-    logger.info(f"[POLLINATIONS_I2V] Animating uploaded image for job {job_id}...")
+def run_exact_image_motion_engine(prompt: str, image_path: str, job_id: str) -> Optional[str]:
+    logger.info(f"[EXACT_I2V_ENGINE] Animating user's exact uploaded image {image_path}...")
     try:
         if not verify_file(image_path):
             return None
@@ -1616,42 +1616,36 @@ def run_pollinations_i2v_engine(prompt: str, image_path: str, job_id: str) -> Op
         target_h = max(256, (h // 16) * 16)
         img = cv2.resize(img, (target_w, target_h), interpolation=cv2.INTER_LANCZOS4)
 
-        encoded_prompt = requests.utils.quote(f"{prompt}, animated motion, masterpiece")
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+        num_frames = 45
+        frames = []
 
-        ai_frames = [img]
-        for i in range(3):
-            seed = random.randint(100, 99999) + i * 20
-            url = f"https://image.pollinations.ai/prompt/{encoded_prompt}%20motion%20step%20{i+1}?width={target_w}&height={target_h}&model=flux&nologo=true&seed={seed}"
-            res = requests.get(url, headers=headers, timeout=8)
-            if res.status_code == 200:
-                frame_np = np.frombuffer(res.content, np.uint8)
-                frame_img = cv2.imdecode(frame_np, cv2.IMREAD_COLOR)
-                if frame_img is not None:
-                    frame_img = cv2.resize(frame_img, (target_w, target_h))
-                    ai_frames.append(frame_img)
+        for i in range(num_frames):
+            progress = i / float(num_frames)
+            shift_x = int(math.sin(progress * math.pi) * (target_w * 0.03))
+            shift_y = int(math.cos(progress * math.pi) * (target_h * 0.025))
+            scale = 1.0 + math.sin(progress * math.pi) * 0.04
 
-        smooth_frames = []
-        for i in range(len(ai_frames) - 1):
-            f1 = ai_frames[i]
-            f2 = ai_frames[i+1]
-            for alpha in np.linspace(0, 1, 8):
-                blended = cv2.addWeighted(f1, 1.0 - float(alpha), f2, float(alpha), 0)
-                smooth_frames.append(blended)
+            M = np.float32([
+                [scale, 0, (1 - scale) * target_w / 2 + shift_x],
+                [0, scale, (1 - scale) * target_h / 2 + shift_y]
+            ])
+
+            frame = cv2.warpAffine(img, M, (target_w, target_h), borderMode=cv2.BORDER_REFLECT)
+            frames.append(frame)
 
         output_path = os.path.join(OUTPUT_DIR, f"{job_id}.mp4")
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         out = cv2.VideoWriter(output_path, fourcc, 15, (target_w, target_h))
 
-        for f in smooth_frames:
+        for f in frames:
             out.write(f)
         out.release()
 
         if verify_file(output_path):
-            logger.info(f"[POLLINATIONS_I2V] SUCCESS for {job_id} -> /api/outputs/{job_id}.mp4")
+            logger.info(f"[EXACT_I2V_ENGINE] SUCCESS for {job_id} -> /api/outputs/{job_id}.mp4")
             return f"/api/outputs/{job_id}.mp4"
     except Exception as e:
-        logger.warning(f"[POLLINATIONS_I2V] Exception: {e}")
+        logger.warning(f"[EXACT_I2V_ENGINE] Exception: {e}")
     return None
 
 # --- A. PROMPT -> IMAGE ---
