@@ -956,7 +956,7 @@ def run_t2v_gradio(prompt: str, candidate: dict, job_id: str) -> dict:
     logger.info(f"[T2V] [{provider_name}] Connecting to {candidate['url']}...")
 
     try:
-        client = create_gradio_client(candidate["url"], timeout=10)
+        client = create_gradio_client(candidate["url"], timeout=90)
 
         def _predict_t2v():
             if candidate["type"] == "ltx":
@@ -1035,7 +1035,7 @@ def run_i2v_gradio(candidate: dict, prompt: str, image_path: str, job_id: str) -
     logger.info(f"[I2V] [{provider_name}] Connecting to {candidate['url']}...")
 
     try:
-        client = create_gradio_client(candidate["url"], timeout=10)
+        client = create_gradio_client(candidate["url"], timeout=90)
 
         def _predict_i2v():
             if candidate["type"] == "wan22_lightning":
@@ -1600,6 +1600,55 @@ def home():
         "version": VERSION,
         "status": "active"
     }
+
+def run_fast_pollinations_video_engine(prompt: str, job_id: str) -> Optional[str]:
+    logger.info(f"[FAST_VIDEO_ENGINE] Generating 2-second ultra-fast video for {job_id}...")
+    try:
+        encoded = requests.utils.quote(prompt)
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+
+        url = f"https://image.pollinations.ai/prompt/{encoded}%20cinematic%20masterpiece?width=512&height=512&model=flux&nologo=true"
+        res = requests.get(url, headers=headers, timeout=12)
+        if res.status_code != 200:
+            return None
+
+        img_np = np.frombuffer(res.content, np.uint8)
+        img = cv2.imdecode(img_np, cv2.IMREAD_COLOR)
+        if img is None:
+            return None
+
+        h, w, _ = img.shape
+        num_frames = 45
+        frames = []
+
+        for i in range(num_frames):
+            progress = i / float(num_frames)
+            shift_x = int(math.sin(progress * math.pi) * (w * 0.04))
+            shift_y = int(math.cos(progress * math.pi) * (h * 0.03))
+            scale = 1.0 + math.sin(progress * math.pi) * 0.05
+
+            M = np.float32([
+                [scale, 0, (1 - scale) * w / 2 + shift_x],
+                [0, scale, (1 - scale) * h / 2 + shift_y]
+            ])
+
+            frame = cv2.warpAffine(img, M, (w, h), borderMode=cv2.BORDER_REFLECT)
+            frames.append(frame)
+
+        output_path = os.path.join(OUTPUT_DIR, f"{job_id}.mp4")
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        out = cv2.VideoWriter(output_path, fourcc, 15, (w, h))
+
+        for f in frames:
+            out.write(f)
+        out.release()
+
+        if verify_file(output_path):
+            logger.info(f"[FAST_VIDEO_ENGINE] ULTRA-FAST SUCCESS for {job_id} -> /api/outputs/{job_id}.mp4")
+            return f"/api/outputs/{job_id}.mp4"
+    except Exception as e:
+        logger.warning(f"[FAST_VIDEO_ENGINE] Exception: {e}")
+    return None
 
 def run_exact_image_motion_engine(prompt: str, image_path: str, job_id: str) -> Optional[str]:
     logger.info(f"[EXACT_I2V_ENGINE] Animating user's exact uploaded image {image_path}...")
