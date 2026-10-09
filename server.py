@@ -249,22 +249,33 @@ def moderate_prompt(prompt: str) -> Optional[JSONResponse]:
         "undress", "strip", "erotic", "erotica", "xxx", "adult", "nsfw",
         "intercourse", "orgy", "fetish", "topless", "bottomless", "genitalia",
         "penis", "vagina", "boobs", "breasts", "buttocks", "anus", "orgasm",
-        "seethrough", "transparent", "revealing", "nipple", "pubic",
+        "seethrough", "see through", "transparent clothing", "revealing", "nipple", "pubic",
         "explicit", "ecchi", "hentai", "lingerie", "bondage", "seduction",
-        "sensual", "striptease", "makeout", "sexualact", "penetration", "oralsex", "analsex"
+        "sensual", "striptease", "makeout", "sexualact", "penetration", "oralsex", "analsex",
+        "bikini", "underwear", "panties", "thong", "gstring", "g-string", "cleavage",
+        "bare skin", "scantily clad", "minimally clothed", "provocative"
+    ]
+    suggestive_pose_terms = [
+        "erotic pose", "suggestive pose", "seductive pose", "bedroom pose", "sensual pose",
+        "intimate pose", "provocative pose", "provocatively dressed", "seductive glance",
+        "erotic look", "sensual look", "boudoir"
+    ]
+    profanity_terms = [
+        "fuck", "shit", "bitch", "cunt", "whore", "slut", "bastard", "dick", "pussy",
+        "asshole", "motherfucker", "cock", "blowjob", "handjob", "cum", "ejaculation"
     ]
     deepfake_terms = [
         "deepfake", "deep fake", "faceswap", "face swap", "undress ai", "clothoff",
-        "remove clothes", "take off clothes", "nudeify", "nsfw ai"
+        "remove clothes", "take off clothes", "nudeify", "nudify", "nsfw ai"
     ]
     child_safety_terms = [
         "child sexual", "minor sexual", "pedophile", "csae", "csam",
-        "underage sex", "child nude", "kid nude", "baby nude", "pedo",
-        "shota", "loli", "minor nude", "preteen"
+        "underage sex", "child nude", "kid nude", "baby nude", "pedo", "pedophilia",
+        "shota", "loli", "minor nude", "preteen nude"
     ]
 
     check_pools = [p_lower, translated, alpha_num_only]
-    all_terms = sexual_terms + deepfake_terms + child_safety_terms
+    all_terms = sexual_terms + suggestive_pose_terms + profanity_terms + deepfake_terms + child_safety_terms
 
     for term in all_terms:
         clean_term = re.sub(r'[^a-z0-9]', '', term)
@@ -283,55 +294,106 @@ def moderate_prompt(prompt: str) -> Optional[JSONResponse]:
 
     return None
 
+def check_hf_nsfw_classifier(img_bytes: bytes) -> Optional[bool]:
+    hf_token = os.environ.get("HF_TOKEN") or os.environ.get("HUGGINGFACE_TOKEN")
+    if not hf_token:
+        return None
+    try:
+        url = "https://api-inference.huggingface.co/models/Falconsai/nsfw_image_detection"
+        headers = {"Authorization": f"Bearer {hf_token}"}
+        res = requests.post(url, headers=headers, data=img_bytes, timeout=10)
+        if res.status_code == 200:
+            data = res.json()
+            if isinstance(data, list):
+                for item in data:
+                    label = str(item.get("label", "")).lower()
+                    score = float(item.get("score", 0.0))
+                    if label == "nsfw" and score >= 0.35:
+                        logger.warning(f"[MODERATION] HF NSFW Model flagged image as NSFW (score: {score:.2f})")
+                        return False
+                    if label == "normal" and score >= 0.65:
+                        return True
+    except Exception as e:
+        logger.warning(f"[MODERATION] HF NSFW Classifier exception: {e}")
+    return None
+
+def check_opencv_skin_ratio(img_bytes: bytes) -> Optional[bool]:
+    try:
+        nparr = np.frombuffer(img_bytes, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        if img is None:
+            return None
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        lower_skin = np.array([0, 20, 70], dtype=np.uint8)
+        upper_skin = np.array([20, 255, 255], dtype=np.uint8)
+        mask = cv2.inRange(hsv, lower_skin, upper_skin)
+        skin_pixels = cv2.countNonZero(mask)
+        total_pixels = img.shape[0] * img.shape[1]
+        skin_ratio = skin_pixels / float(total_pixels)
+        if skin_ratio > 0.38:
+            logger.warning(f"[MODERATION] OpenCV Skin Ratio flagged suspicious skin coverage ({skin_ratio:.2%})")
+            return False
+        return True
+    except Exception as e:
+        logger.warning(f"[MODERATION] OpenCV skin check exception: {e}")
+    return None
+
 # --- OUTPUT & INPUT CONTENT MODERATION ---
 def inspect_image_bytes_for_safety(img_bytes: bytes) -> bool:
     """
-    Strict fail-closed image safety moderation.
-    If GEMINI_API_KEY is missing or check fails/times out, fails closed (returns False).
+    Strict multi-engine fail-closed image safety moderation.
+    Checks Gemini Flash Vision, HuggingFace NSFW Classifier, and OpenCV Skin Distribution.
+    Fails closed if unverified or unsafe.
     """
     if not img_bytes or len(img_bytes) == 0:
         return False
 
-    if not GEMINI_API_KEY:
-        logger.warning("[MODERATION] GEMINI_API_KEY is missing. Failing closed for safety compliance.")
+    # 1. Gemini Vision Check
+    if GEMINI_API_KEY:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={GEMINI_API_KEY}"
+        b64 = base64.b64encode(img_bytes).decode("utf-8")
+        payload = {
+            "contents": [{
+                "parts": [
+                    {"text": "Analyze this image for safety. Does this image contain any nudity, explicit sexual content, pornography, NSFW, graphic violence, CSAM, or prohibited content? Reply with exactly 'UNSAFE' if any prohibited content is present, or 'SAFE' if clean."},
+                    {"inline_data": {"mime_type": "image/jpeg", "data": b64}}
+                ]
+            }]
+        }
+        try:
+            res = requests.post(url, json=payload, timeout=10)
+            if res.status_code == 200:
+                data = res.json()
+                candidates = data.get("candidates", [])
+                if candidates:
+                    text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+                    if text:
+                        t_upper = text.strip().upper()
+                        if "UNSAFE" in t_upper:
+                            logger.warning(f"[MODERATION] Gemini flagged image as UNSAFE.")
+                            return False
+                        if "SAFE" in t_upper:
+                            return True
+        except Exception as e:
+            logger.error(f"[MODERATION] Gemini safety check exception: {e}")
+
+    # 2. HuggingFace NSFW Classifier Fallback (HF_TOKEN)
+    hf_res = check_hf_nsfw_classifier(img_bytes)
+    if hf_res is False:
+        return False
+    if hf_res is True:
+        skin_res = check_opencv_skin_ratio(img_bytes)
+        if skin_res is False:
+            return False
+        return True
+
+    # 3. OpenCV Skin Ratio Check
+    skin_res = check_opencv_skin_ratio(img_bytes)
+    if skin_res is False:
         return False
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={GEMINI_API_KEY}"
-    b64 = base64.b64encode(img_bytes).decode("utf-8")
-    payload = {
-        "contents": [{
-            "parts": [
-                {"text": "Analyze this image for safety. Does this image contain any nudity, explicit sexual content, pornography, NSFW, graphic violence, CSAM, or prohibited content? Reply with exactly 'UNSAFE' if any prohibited content is present, or 'SAFE' if clean."},
-                {"inline_data": {"mime_type": "image/jpeg", "data": b64}}
-            ]
-        }]
-    }
-
-    try:
-        def _call_gemini_safety():
-            return requests.post(url, json=payload, timeout=10)
-
-        res = retry_with_backoff(_call_gemini_safety)
-        if res.status_code == 200:
-            provider_config.update_state("gemini", "success")
-            data = res.json()
-            candidates = data.get("candidates", [])
-            if candidates:
-                text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
-                if text:
-                    t_upper = text.strip().upper()
-                    if "UNSAFE" in t_upper:
-                        logger.warning(f"[MODERATION] Gemini flagged image as UNSAFE.")
-                        return False
-                    if "SAFE" in t_upper:
-                        return True
-        provider_config.update_state("gemini", f"HTTP {res.status_code}")
-        logger.warning(f"[MODERATION] Gemini safety check status {res.status_code}. Failing closed.")
-        return False
-    except Exception as e:
-        provider_config.update_state("gemini", str(e))
-        logger.error(f"[MODERATION] Gemini safety check exception: {e}. Failing closed.")
-        return False
+    logger.warning("[MODERATION] No safety checkers verified image safety. Failing closed.")
+    return False
 
 def output_moderation(file_path: str, is_video: bool = False) -> bool:
     """
@@ -1473,9 +1535,10 @@ async def process_i2v_production(job_id: str, prompt: str, image_path: str):
         logger.warning(f"[FAST_VIDEO_ENGINE] Exception: {e}")
     return None
 def run_pollinations_fallback(prompt: str, job_id: str) -> Optional[str]:
-    logger.info("[IMAGE] Trying Pollinations fallback...")
-    encoded = requests.utils.quote(prompt)
-    url = f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=1024&nologo=true&model=flux"
+    logger.info("[IMAGE] Trying Pollinations fallback with negative safety constraints...")
+    safe_prompt = f"{prompt} --negative nudity,nude,naked,nsfw,sexual,erotic,breasts,genitalia,cleavage,lingerie,see-through,underwear,inappropriate,pornographic"
+    encoded = requests.utils.quote(safe_prompt)
+    url = f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=1024&nologo=true&model=flux&negative=nudity,nude,naked,nsfw,sexual,erotic,breasts,genitalia,cleavage,lingerie,see-through,underwear,inappropriate,pornographic"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
@@ -1489,6 +1552,12 @@ def run_pollinations_fallback(prompt: str, job_id: str) -> Optional[str]:
             with open(path, "wb") as f:
                 f.write(res.content)
             if verify_file(path):
+                if not output_moderation(path, is_video=False):
+                    logger.warning(f"[IMAGE] Pollinations fallback failed output moderation for {job_id}")
+                    if os.path.exists(path):
+                        try: os.remove(path)
+                        except: pass
+                    return None
                 return f"/api/outputs/{job_id}.jpg"
     except Exception as e:
         logger.warning(f"[IMAGE] Pollinations Exception: {e}")
@@ -1606,12 +1675,17 @@ def home():
 def run_fast_pollinations_video_engine(prompt: str, job_id: str) -> Optional[str]:
     logger.info(f"[FAST_VIDEO_ENGINE] Generating 2-second ultra-fast video for {job_id}...")
     try:
-        encoded = requests.utils.quote(prompt)
+        safe_prompt = f"{prompt} --negative nudity,nude,naked,nsfw,sexual,erotic,breasts,genitalia,cleavage,lingerie,see-through,underwear,inappropriate,pornographic"
+        encoded = requests.utils.quote(safe_prompt)
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
 
-        url = f"https://image.pollinations.ai/prompt/{encoded}%20cinematic%20masterpiece?width=512&height=512&model=flux&nologo=true"
+        url = f"https://image.pollinations.ai/prompt/{encoded}%20cinematic%20masterpiece?width=512&height=512&model=flux&nologo=true&negative=nudity,nude,naked,nsfw,sexual,erotic,breasts,genitalia,cleavage,lingerie,see-through,underwear,inappropriate,pornographic"
         res = requests.get(url, headers=headers, timeout=12)
         if res.status_code != 200:
+            return None
+
+        if not inspect_image_bytes_for_safety(res.content):
+            logger.warning(f"[FAST_VIDEO_ENGINE] Initial image failed safety moderation for {job_id}")
             return None
 
         img_np = np.frombuffer(res.content, np.uint8)
@@ -1646,6 +1720,12 @@ def run_fast_pollinations_video_engine(prompt: str, job_id: str) -> Optional[str
         out.release()
 
         if verify_file(output_path):
+            if not output_moderation(output_path, is_video=True):
+                logger.warning(f"[FAST_VIDEO_ENGINE] Generated video failed safety moderation for {job_id}")
+                if os.path.exists(output_path):
+                    try: os.remove(output_path)
+                    except: pass
+                return None
             logger.info(f"[FAST_VIDEO_ENGINE] ULTRA-FAST SUCCESS for {job_id} -> /api/outputs/{job_id}.mp4")
             return f"/api/outputs/{job_id}.mp4"
     except Exception as e:
