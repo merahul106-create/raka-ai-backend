@@ -286,14 +286,15 @@ def moderate_prompt(prompt: str) -> Optional[JSONResponse]:
 # --- OUTPUT & INPUT CONTENT MODERATION ---
 def inspect_image_bytes_for_safety(img_bytes: bytes) -> bool:
     """
-    Inspects image bytes for safety. If GEMINI_API_KEY is configured, uses Gemini Vision.
-    If GEMINI_API_KEY is unconfigured, permits processing unless explicit error or failure occurs.
+    Strict fail-closed image safety moderation.
+    If GEMINI_API_KEY is missing or check fails/times out, fails closed (returns False).
     """
     if not img_bytes or len(img_bytes) == 0:
         return False
 
     if not GEMINI_API_KEY:
-        return True
+        logger.warning("[MODERATION] GEMINI_API_KEY is missing. Failing closed for safety compliance.")
+        return False
 
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={GEMINI_API_KEY}"
     b64 = base64.b64encode(img_bytes).decode("utf-8")
@@ -322,14 +323,15 @@ def inspect_image_bytes_for_safety(img_bytes: bytes) -> bool:
                     if "UNSAFE" in t_upper:
                         logger.warning(f"[MODERATION] Gemini flagged image as UNSAFE.")
                         return False
-                    return True
+                    if "SAFE" in t_upper:
+                        return True
         provider_config.update_state("gemini", f"HTTP {res.status_code}")
-        logger.warning(f"[MODERATION] Gemini safety check status {res.status_code}, defaulting to SAFE")
-        return True
+        logger.warning(f"[MODERATION] Gemini safety check status {res.status_code}. Failing closed.")
+        return False
     except Exception as e:
         provider_config.update_state("gemini", str(e))
-        logger.warning(f"[MODERATION] Gemini safety check exception: {e}, defaulting to SAFE")
-        return True
+        logger.error(f"[MODERATION] Gemini safety check exception: {e}. Failing closed.")
+        return False
 
 def output_moderation(file_path: str, is_video: bool = False) -> bool:
     """
