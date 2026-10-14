@@ -630,87 +630,7 @@ def download_file(url: str, job_id: str, ext: str = ".mp4") -> Optional[str]:
         logger.error(f"Download failed: {e}")
     return None
 
-def generate_local_fallback_video(job_id: str, prompt: str, image_path: Optional[str] = None) -> str:
-    output_path = os.path.join(OUTPUT_DIR, f"{job_id}.mp4")
-    width, height = 1280, 720
-    fps = 30
-    duration_secs = 4
-    total_frames = fps * duration_secs
 
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
-
-    base_img = None
-    if image_path and os.path.exists(image_path):
-        try:
-            img = cv2.imread(image_path)
-            if img is not None:
-                base_img = cv2.resize(img, (width, height))
-        except Exception as e:
-            logger.error(f"[FALLBACK_VIDEO] Failed to load input image: {e}")
-
-    clean_prompt = prompt.strip() if prompt else "AI Video Generation"
-    words = clean_prompt.split()
-    lines = []
-    current_line = ""
-    for word in words:
-        if len(current_line + " " + word) < 40:
-            current_line = (current_line + " " + word).strip()
-        else:
-            lines.append(current_line)
-            current_line = word
-    if current_line:
-        lines.append(current_line)
-    if not lines:
-        lines = [clean_prompt]
-
-    for frame_idx in range(total_frames):
-        t = frame_idx / total_frames
-        if base_img is not None:
-            zoom = 1.0 + 0.05 * math.sin(t * math.pi * 2)
-            M = cv2.getRotationMatrix2D((width/2, height/2), 0, zoom)
-            frame = cv2.warpAffine(base_img, M, (width, height), borderMode=cv2.BORDER_REFLECT)
-            overlay = frame.copy()
-            cv2.rectangle(overlay, (0, 0), (width, height), (0, 0, 0), -1)
-            cv2.addWeighted(overlay, 0.4, frame, 0.6, 0, frame)
-        else:
-            frame = np.zeros((height, width, 3), dtype=np.uint8)
-            r_val = int(30 + 50 * math.sin(t * math.pi * 2))
-            g_val = int(40 + 60 * math.cos(t * math.pi * 2))
-            b_val = int(80 + 70 * math.sin(t * math.pi + 1))
-            frame[:] = (b_val, g_val, r_val)
-
-            for i in range(15):
-                cx = int((width / 2) + (300 * math.sin(t * math.pi * 2 + i)))
-                cy = int((height / 2) + (200 * math.cos(t * math.pi * 2 + i * 0.5)))
-                radius = int(20 + 10 * math.sin(t * math.pi + i))
-                cv2.circle(frame, (cx, cy), radius, (255, 255, 255), 1)
-
-        cv2.putText(frame, "RAKA AI VIDEO PRODUCTION", (50, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2, cv2.LINE_AA)
-
-        y_start = height // 2 - (len(lines) * 20)
-        for idx, line in enumerate(lines):
-            y_pos = y_start + (idx * 45)
-            cv2.putText(frame, line, (52, y_pos + 2), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 0), 3, cv2.LINE_AA)
-            cv2.putText(frame, line, (50, y_pos), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), 2, cv2.LINE_AA)
-
-        progress_width = int(width * t)
-        cv2.rectangle(frame, (0, height - 10), (width, height), (50, 50, 50), -1)
-        cv2.rectangle(frame, (0, height - 10), (progress_width, height), (0, 255, 0), -1)
-
-        out.write(frame)
-
-    out.release()
-    if verify_file(output_path):
-        if not output_moderation(output_path, is_video=True):
-            logger.warning(f"[FALLBACK_VIDEO] Output fallback video failed safety moderation for {job_id}")
-            if os.path.exists(output_path):
-                try: os.remove(output_path)
-                except: pass
-            return None
-        logger.info(f"[FALLBACK_VIDEO] Generated local fallback MP4 video at {output_path}")
-        return f"/api/outputs/{job_id}.mp4"
-    return None
 
 # --- GEMINI AI SERVICES ---
 def analyze_with_gemini(prompt_text: str, image_bytes: Optional[bytes] = None, mime_type: str = "image/jpeg") -> Optional[str]:
@@ -1243,32 +1163,13 @@ def run_i2v_gradio(candidate: dict, prompt: str, image_path: str, job_id: str) -
 # --- WORKER SYNC EXECUTORS ---
 def process_t2v_production_sync(job_id: str, prompt: str):
     logger.info(f"T2V_WORKER_STARTED | Job: {job_id}")
-    update_job(job_id, status="processing", stage="Generating Video")
+    update_job(job_id, status="processing", stage="Generating AI Video")
 
-    # 1. Try Fast Video Engine (Instant 3-Second Generation)
-    provider_id = "FastEngine/Pollinations"
-    logger.info(f"T2V_ATTEMPT | Job: {job_id} | Provider: {provider_id}")
-    update_job(job_id, provider=provider_id, stage="Generating Video")
-    fast_url = run_fast_pollinations_video_engine(prompt, job_id)
-    if fast_url:
-        logger.info(f"T2V_SUCCESS | Job: {job_id} | Provider: {provider_id}")
-        update_job(
-            job_id,
-            status="completed",
-            stage="Completed",
-            video_url=fast_url,
-            url=fast_url,
-            result_url=fast_url,
-            provider=provider_id,
-            progress=100
-        )
-        return
-
-    # 2. Try Replicate Fast GPU
+    # 1. Try Replicate Fast AI Video GPU (Minimax Video-01)
     if get_replicate_api_key():
         provider_id = "Replicate/minimax"
         logger.info(f"T2V_ATTEMPT | Job: {job_id} | Provider: {provider_id}")
-        update_job(job_id, provider=provider_id, stage="Generating Video")
+        update_job(job_id, provider=provider_id, stage="Generating via Replicate AI")
 
         rep_result = run_replicate_t2v(prompt)
 
@@ -1293,10 +1194,10 @@ def process_t2v_production_sync(job_id: str, prompt: str):
                 )
                 return
 
-    # 2. Try Fast T2I2V Pipeline (Text -> Pollinations 2s Ref Image -> Wan 2.2 Lightning I2V)
+    # 2. Try T2I2V Pipeline (Pollinations Flux Ref Image -> Wan 2.2 Lightning AI Video Model)
     provider_id = "T2I2V/Wan2.2-Lightning"
     logger.info(f"T2V_ATTEMPT | Job: {job_id} | Provider: {provider_id}")
-    update_job(job_id, provider=provider_id, stage="Trying T2I2V Pipeline")
+    update_job(job_id, provider=provider_id, stage="Generating via Wan 2.2 AI Model")
     try:
         ref_job_id = f"ref_{job_id}"
         ref_img_url = run_pollinations_fallback(prompt, ref_job_id)
@@ -1332,11 +1233,11 @@ def process_t2v_production_sync(job_id: str, prompt: str):
     except Exception as e:
         logger.warning(f"T2I2V Pipeline Exception for job {job_id}: {e}")
 
-    # 3. Try Hugging Face T2V spaces
+    # 3. Try Hugging Face T2V spaces (Wan2.1, LTX, CogVideoX)
     for cand in T2V_CANDIDATES:
         provider_id = f"HF/{cand['type']}"
         logger.info(f"T2V_ATTEMPT | Job: {job_id} | Provider: {provider_id}")
-        update_job(job_id, provider=provider_id, stage=f"Trying {provider_id}")
+        update_job(job_id, provider=provider_id, stage=f"Generating via {provider_id}")
 
         if cand["type"] == "wan21" and not DASHSCOPE_API_KEY:
             continue
@@ -1368,50 +1269,55 @@ def process_t2v_production_sync(job_id: str, prompt: str):
                 )
                 return
 
-        jobs[job_id]["attempts"].append({
-            "provider": provider_id,
-            "error": rep_result.get("error", "Failed"),
-            "details": rep_result.get("details", "")[:250]
-        })
-        save_jobs_to_disk()
-
-    # 4. Ultimate Ultra-Fast Fallback (Guaranteed 5-Second Video Generation)
-    logger.info(f"T2V_FAST_FALLBACK | Job: {job_id} | Running Fast Video Engine")
-    fast_url = run_fast_pollinations_video_engine(prompt, job_id)
-    if fast_url:
-        logger.info(f"T2V_FAST_SUCCESS | Job: {job_id} | Provider: FastEngine/Pollinations")
-        update_job(
-            job_id,
-            status="completed",
-            stage="Completed",
-            video_url=fast_url,
-            url=fast_url,
-            result_url=fast_url,
-            provider="FastEngine/Pollinations",
-            progress=100
-        )
-        return
-
-    # All external AI providers failed. Mark job as failed.
-    logger.warning(f"T2V_EXTERNAL_FAILED | Job: {job_id} | All external AI providers failed.")
+    # All real AI video providers failed. Mark job as failed.
+    logger.warning(f"T2V_ALL_FAILED | Job: {job_id} | All real AI video providers failed.")
     update_job(
         job_id,
         status="failed",
         stage="Failed",
         error="GENERATION_FAILED",
-        details="All AI providers are currently busy or reached capacity. Please try again later.",
+        details="All real AI video generation models are currently processing requests or busy. Please try again in a moment.",
         progress=0
     )
 
 def process_i2v_production_sync(job_id: str, prompt: str, image_path: str):
     logger.info(f"I2V_WORKER_STARTED | Job: {job_id} | Image: {image_path}")
-    update_job(job_id, status="processing", stage="Generating Video")
+    update_job(job_id, status="processing", stage="Animating AI Video")
 
-    # 1. Try Hugging Face I2V spaces with user's actual uploaded image
+    # 1. Try Replicate I2V with user's actual uploaded image
+    if get_replicate_api_key():
+        provider_id = "Replicate/minimax-i2v"
+        logger.info(f"I2V_ATTEMPT | Job: {job_id} | Provider: {provider_id}")
+        update_job(job_id, provider=provider_id, stage="Animating via Replicate AI")
+
+        rep_result = run_replicate_i2v(prompt, image_path)
+
+        if "url" in rep_result:
+            ext_url = rep_result["url"]
+            local_url = download_file(ext_url, job_id)
+            expected_file_path = os.path.join(OUTPUT_DIR, f"{job_id}.mp4")
+            if local_url and verify_file(expected_file_path):
+                if not output_moderation(expected_file_path, is_video=True):
+                    handle_output_moderation_failure(job_id, provider_id)
+                    return
+                logger.info(f"I2V_SUCCESS | Job: {job_id} | Provider: {provider_id}")
+                update_job(
+                    job_id,
+                    status="completed",
+                    stage="Completed",
+                    video_url=local_url,
+                    url=local_url,
+                    result_url=local_url,
+                    provider=provider_id,
+                    progress=100
+                )
+                return
+
+    # 2. Try Hugging Face I2V spaces with user's actual uploaded image (Wan 2.2 Lightning / Wan 2.1)
     for cand in I2V_CANDIDATES:
         provider_id = f"HF/{cand['type']}"
         logger.info(f"I2V_ATTEMPT | Job: {job_id} | Provider: {provider_id}")
-        update_job(job_id, provider=provider_id, stage=f"Trying {provider_id}")
+        update_job(job_id, provider=provider_id, stage=f"Animating via {provider_id}")
 
         if cand["type"] == "wan21" and not DASHSCOPE_API_KEY:
             continue
@@ -1443,60 +1349,14 @@ def process_i2v_production_sync(job_id: str, prompt: str, image_path: str):
                 )
                 return
 
-    # 2. Try Replicate I2V with user's actual uploaded image
-    if get_replicate_api_key():
-        provider_id = "Replicate/minimax-i2v"
-        logger.info(f"I2V_ATTEMPT | Job: {job_id} | Provider: {provider_id}")
-        update_job(job_id, provider=provider_id, stage="Trying Replicate I2V")
-
-        rep_result = run_replicate_i2v(prompt, image_path)
-
-        if "url" in rep_result:
-            ext_url = rep_result["url"]
-            local_url = download_file(ext_url, job_id)
-            expected_file_path = os.path.join(OUTPUT_DIR, f"{job_id}.mp4")
-            if local_url and verify_file(expected_file_path):
-                if not output_moderation(expected_file_path, is_video=True):
-                    handle_output_moderation_failure(job_id, provider_id)
-                    return
-                logger.info(f"I2V_SUCCESS | Job: {job_id} | Provider: {provider_id}")
-                update_job(
-                    job_id,
-                    status="completed",
-                    stage="Completed",
-                    video_url=local_url,
-                    url=local_url,
-                    result_url=local_url,
-                    provider=provider_id,
-                    progress=100
-                )
-                return
-
-    # 3. Fallback: Exact User Image Motion Engine (100% Same Image Guarantee)
-    logger.info(f"I2V_EXACT_FALLBACK | Job: {job_id} | Animating exact uploaded image")
-    exact_url = run_exact_image_motion_engine(prompt, image_path, job_id)
-    if exact_url:
-        logger.info(f"I2V_SUCCESS | Job: {job_id} | Provider: ExactImage/MotionEngine")
-        update_job(
-            job_id,
-            status="completed",
-            stage="Completed",
-            video_url=exact_url,
-            url=exact_url,
-            result_url=exact_url,
-            provider="ExactImage/MotionEngine",
-            progress=100
-        )
-        return
-
-    # 4. All real AI Image-To-Video models failed
+    # All real AI Image-To-Video models failed
     logger.warning(f"I2V_FAILED | Job: {job_id} | All real AI Image-to-Video models failed.")
     update_job(
         job_id,
         status="failed",
         stage="Failed",
         error="GENERATION_FAILED",
-        details="Real AI video engines are currently busy. Please try again in a moment.",
+        details="All real AI image-to-video animation models are currently processing requests or busy. Please try again in a moment.",
         progress=0
     )
 
@@ -1719,119 +1579,6 @@ def home():
         "status": "active"
     }
 
-def run_fast_pollinations_video_engine(prompt: str, job_id: str) -> Optional[str]:
-    logger.info(f"[FAST_VIDEO_ENGINE] Generating 2-second ultra-fast video for {job_id}...")
-    try:
-        safe_prompt = f"{prompt} --negative nudity,nude,naked,nsfw,sexual,erotic,breasts,genitalia,cleavage,lingerie,see-through,underwear,inappropriate,pornographic"
-        encoded = requests.utils.quote(safe_prompt)
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
-
-        url = f"https://image.pollinations.ai/prompt/{encoded}%20cinematic%20masterpiece?width=512&height=512&model=flux&nologo=true&negative=nudity,nude,naked,nsfw,sexual,erotic,breasts,genitalia,cleavage,lingerie,see-through,underwear,inappropriate,pornographic"
-        res = requests.get(url, headers=headers, timeout=12)
-        if res.status_code != 200:
-            return None
-
-        if not inspect_image_bytes_for_safety(res.content):
-            logger.warning(f"[FAST_VIDEO_ENGINE] Initial image failed safety moderation for {job_id}")
-            return None
-
-        img_np = np.frombuffer(res.content, np.uint8)
-        img = cv2.imdecode(img_np, cv2.IMREAD_COLOR)
-        if img is None:
-            return None
-
-        h, w, _ = img.shape
-        num_frames = 45
-        frames = []
-
-        for i in range(num_frames):
-            progress = i / float(num_frames)
-            shift_x = int(math.sin(progress * math.pi) * (w * 0.04))
-            shift_y = int(math.cos(progress * math.pi) * (h * 0.03))
-            scale = 1.0 + math.sin(progress * math.pi) * 0.05
-
-            M = np.float32([
-                [scale, 0, (1 - scale) * w / 2 + shift_x],
-                [0, scale, (1 - scale) * h / 2 + shift_y]
-            ])
-
-            frame = cv2.warpAffine(img, M, (w, h), borderMode=cv2.BORDER_REFLECT)
-            frames.append(frame)
-
-        output_path = os.path.join(OUTPUT_DIR, f"{job_id}.mp4")
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter(output_path, fourcc, 15, (w, h))
-
-        for f in frames:
-            out.write(f)
-        out.release()
-
-        if verify_file(output_path):
-            if not output_moderation(output_path, is_video=True):
-                logger.warning(f"[FAST_VIDEO_ENGINE] Generated video failed safety moderation for {job_id}")
-                if os.path.exists(output_path):
-                    try: os.remove(output_path)
-                    except: pass
-                return None
-            logger.info(f"[FAST_VIDEO_ENGINE] ULTRA-FAST SUCCESS for {job_id} -> /api/outputs/{job_id}.mp4")
-            return f"/api/outputs/{job_id}.mp4"
-    except Exception as e:
-        logger.warning(f"[FAST_VIDEO_ENGINE] Exception: {e}")
-    return None
-
-def run_exact_image_motion_engine(prompt: str, image_path: str, job_id: str) -> Optional[str]:
-    logger.info(f"[EXACT_I2V_ENGINE] Animating user's exact uploaded image {image_path}...")
-    try:
-        if not verify_file(image_path):
-            return None
-
-        img = cv2.imread(image_path)
-        if img is None:
-            return None
-
-        h, w, _ = img.shape
-        target_w = max(256, (w // 16) * 16)
-        target_h = max(256, (h // 16) * 16)
-        img = cv2.resize(img, (target_w, target_h), interpolation=cv2.INTER_LANCZOS4)
-
-        num_frames = 45
-        frames = []
-
-        for i in range(num_frames):
-            progress = i / float(num_frames)
-            shift_x = int(math.sin(progress * math.pi) * (target_w * 0.03))
-            shift_y = int(math.cos(progress * math.pi) * (target_h * 0.025))
-            scale = 1.0 + math.sin(progress * math.pi) * 0.04
-
-            M = np.float32([
-                [scale, 0, (1 - scale) * target_w / 2 + shift_x],
-                [0, scale, (1 - scale) * target_h / 2 + shift_y]
-            ])
-
-            frame = cv2.warpAffine(img, M, (target_w, target_h), borderMode=cv2.BORDER_REFLECT)
-            frames.append(frame)
-
-        output_path = os.path.join(OUTPUT_DIR, f"{job_id}.mp4")
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter(output_path, fourcc, 15, (target_w, target_h))
-
-        for f in frames:
-            out.write(f)
-        out.release()
-
-        if verify_file(output_path):
-            if not output_moderation(output_path, is_video=True):
-                logger.warning(f"[EXACT_I2V_ENGINE] Output video failed safety moderation for {job_id}")
-                if os.path.exists(output_path):
-                    try: os.remove(output_path)
-                    except: pass
-                return None
-            logger.info(f"[EXACT_I2V_ENGINE] SUCCESS for {job_id} -> /api/outputs/{job_id}.mp4")
-            return f"/api/outputs/{job_id}.mp4"
-    except Exception as e:
-        logger.warning(f"[EXACT_I2V_ENGINE] Exception: {e}")
-    return None
-
 def run_replicate_t2i(prompt: str, job_id: str) -> Optional[str]:
     api_key = get_replicate_api_key()
     if not api_key:
@@ -1881,65 +1628,6 @@ def run_replicate_t2i(prompt: str, job_id: str) -> Optional[str]:
                             break
     except Exception as e:
         logger.warning(f"[REPLICATE_T2I] Exception: {e}")
-    return None
-
-def generate_local_fallback_image(prompt: str, job_id: str) -> Optional[str]:
-    """
-    Guaranteed high-quality local image generator fallback using PIL / OpenCV.
-    Ensures prompt-to-image NEVER fails or returns HTTP 503 when external APIs are busy.
-    """
-    output_path = os.path.join(OUTPUT_DIR, f"{job_id}.jpg")
-    try:
-        width, height = 1024, 1024
-        img = np.zeros((height, width, 3), dtype=np.uint8)
-
-        # Create multi-color radial gradient background
-        for y in range(height):
-            r_val = int(20 + 80 * math.sin(y / float(height) * math.pi))
-            g_val = int(30 + 100 * math.cos(y / float(height) * math.pi * 0.5))
-            b_val = int(80 + 120 * math.sin(y / float(height) * math.pi * 0.8))
-            img[y, :] = (b_val, g_val, r_val)
-
-        # Add abstract geometric glow circles
-        for i in range(12):
-            cx = int(width * (0.2 + 0.6 * math.sin(i * 1.5)))
-            cy = int(height * (0.2 + 0.6 * math.cos(i * 1.8)))
-            radius = int(80 + 40 * math.sin(i))
-            color = (int(180 + 70 * math.sin(i)), int(120 + 100 * math.cos(i)), int(220 + 35 * math.sin(i)))
-            cv2.circle(img, (cx, cy), radius, color, -1)
-
-        # Blur canvas for smooth artistic background
-        img = cv2.GaussianBlur(img, (101, 101), 0)
-
-        # Overlay title banner and user prompt typography
-        cv2.putText(img, "RAKA AI STUDIO", (60, 100), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 255), 3, cv2.LINE_AA)
-
-        clean_prompt = prompt.strip() if prompt else "Creative AI Generation"
-        words = clean_prompt.split()
-        lines = []
-        curr = ""
-        for w in words:
-            if len(curr + " " + w) < 32:
-                curr = (curr + " " + w).strip()
-            else:
-                lines.append(curr)
-                curr = w
-        if curr:
-            lines.append(curr)
-
-        y_start = height // 2 - (len(lines) * 25)
-        for idx, line in enumerate(lines):
-            y_pos = y_start + (idx * 50)
-            cv2.putText(img, line, (62, y_pos + 2), cv2.FONT_HERSHEY_SIMPLEX, 1.1, (0, 0, 0), 4, cv2.LINE_AA)
-            cv2.putText(img, line, (60, y_pos), cv2.FONT_HERSHEY_SIMPLEX, 1.1, (255, 255, 255), 2, cv2.LINE_AA)
-
-        cv2.imwrite(output_path, img)
-        if verify_file(output_path):
-            if output_moderation(output_path, is_video=False):
-                logger.info(f"[IMAGE_FALLBACK] Generated local fallback image for {job_id}")
-                return f"/api/outputs/{job_id}.jpg"
-    except Exception as e:
-        logger.error(f"[IMAGE_FALLBACK] Error: {e}")
     return None
 
 # --- A. PROMPT -> IMAGE ---
