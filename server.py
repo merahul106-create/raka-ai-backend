@@ -1304,6 +1304,13 @@ def run_guaranteed_ai_video_engine(prompt: str, job_id: str, input_image_path: O
             except Exception as e:
                 logger.warning(f"[GUARANTEED_VIDEO] Stage fetch failed: {e}")
 
+        if len(keyframes) == 1:
+            img_0 = keyframes[0]
+            h_0, w_0, _ = img_0.shape
+            M = np.float32([[1.03, 0, -10], [0, 1.03, -10]])
+            img_1 = cv2.warpAffine(img_0, M, (w_0, h_0), borderMode=cv2.BORDER_REFLECT)
+            keyframes.append(img_1)
+
         if len(keyframes) < 2:
             return None
 
