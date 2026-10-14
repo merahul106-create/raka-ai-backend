@@ -1581,10 +1581,9 @@ async def process_i2v_production(job_id: str, prompt: str, image_path: str):
         logger.warning(f"[FAST_VIDEO_ENGINE] Exception: {e}")
     return None
 def run_pollinations_fallback(prompt: str, job_id: str) -> Optional[str]:
-    logger.info("[IMAGE] Trying Pollinations fallback with negative safety constraints...")
-    safe_prompt = f"{prompt} --negative nudity,nude,naked,nsfw,sexual,erotic,breasts,genitalia,cleavage,lingerie,see-through,underwear,inappropriate,pornographic"
-    encoded = requests.utils.quote(safe_prompt)
-    url = f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=1024&nologo=true&model=flux&negative=nudity,nude,naked,nsfw,sexual,erotic,breasts,genitalia,cleavage,lingerie,see-through,underwear,inappropriate,pornographic"
+    logger.info("[IMAGE] Trying Pollinations fallback...")
+    encoded = requests.utils.quote(prompt)
+    url = f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=1024&nologo=true&model=flux"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
