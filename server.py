@@ -319,9 +319,8 @@ def check_hf_nsfw_classifier(img_bytes: bytes) -> Optional[bool]:
 
 def check_opencv_skin_ratio(img_bytes: bytes) -> Optional[bool]:
     """
-    Joint YCbCr + HSV human skin segmentation heuristic.
-    Requires skin match across BOTH color spaces to avoid false positives on red cars, sunsets, and golden lighting.
-    Flags as UNSAFE only if joint human skin coverage exceeds 60%.
+    Strict YCbCr + HSV human skin segmentation heuristic.
+    Flags as UNSAFE if total skin coverage exceeds 22% or if center torso skin coverage exceeds 25%.
     """
     try:
         nparr = np.frombuffer(img_bytes, np.uint8)
@@ -329,10 +328,13 @@ def check_opencv_skin_ratio(img_bytes: bytes) -> Optional[bool]:
         if img is None:
             return None
 
+        h, w, _ = img.shape
+        total_pixels = float(h * w)
+
         # 1. HSV Skin Mask
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        lower_hsv = np.array([0, 30, 60], dtype=np.uint8)
-        upper_hsv = np.array([20, 180, 255], dtype=np.uint8)
+        lower_hsv = np.array([0, 25, 50], dtype=np.uint8)
+        upper_hsv = np.array([25, 200, 255], dtype=np.uint8)
         mask_hsv = cv2.inRange(hsv, lower_hsv, upper_hsv)
 
         # 2. YCbCr Human Skin Mask (Cb: 77-127, Cr: 133-173)
@@ -344,12 +346,24 @@ def check_opencv_skin_ratio(img_bytes: bytes) -> Optional[bool]:
         # Joint Intersection Mask
         joint_mask = cv2.bitwise_and(mask_hsv, mask_ycbcr)
         skin_pixels = cv2.countNonZero(joint_mask)
-        total_pixels = img.shape[0] * img.shape[1]
-        skin_ratio = skin_pixels / float(total_pixels)
+        skin_ratio = skin_pixels / total_pixels
 
-        if skin_ratio > 0.60:
-            logger.warning(f"[MODERATION] Joint YCbCr+HSV Skin Ratio flagged explicit nudity/skin coverage ({skin_ratio:.2%})")
+        if skin_ratio > 0.22:
+            logger.warning(f"[MODERATION] Total skin ratio flagged inappropriate skin coverage ({skin_ratio:.2%})")
             return False
+
+        # 3. Center Torso Region Inspection (25%-75% width, 20%-80% height)
+        c_y1, c_y2 = int(h * 0.20), int(h * 0.80)
+        c_x1, c_x2 = int(w * 0.25), int(w * 0.75)
+        center_mask = joint_mask[c_y1:c_y2, c_x1:c_x2]
+        center_pixels = cv2.countNonZero(center_mask)
+        center_total = float((c_y2 - c_y1) * (c_x2 - c_x1))
+        center_ratio = center_pixels / center_total
+
+        if center_ratio > 0.25:
+            logger.warning(f"[MODERATION] Center torso skin ratio flagged inappropriate body exposure ({center_ratio:.2%})")
+            return False
+
         return True
     except Exception as e:
         logger.warning(f"[MODERATION] OpenCV skin check exception: {e}")
