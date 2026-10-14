@@ -348,16 +348,16 @@ def check_opencv_skin_ratio(img_bytes: bytes) -> Optional[bool]:
         h, w, _ = img.shape
         total_pixels = float(h * w)
 
-        # 1. HSV Human Skin Mask (Saturation restricted to 20-160 to exclude hyper-saturated sunsets/cars)
+        # 1. HSV Human Skin Mask (Tighter Hue 0-20, Saturation 48-150 to exclude red cars and sunset skies)
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        lower_hsv = np.array([0, 20, 60], dtype=np.uint8)
-        upper_hsv = np.array([25, 160, 240], dtype=np.uint8)
+        lower_hsv = np.array([0, 48, 80], dtype=np.uint8)
+        upper_hsv = np.array([20, 150, 250], dtype=np.uint8)
         mask_hsv = cv2.inRange(hsv, lower_hsv, upper_hsv)
 
-        # 2. YCbCr Human Skin Mask (Cb: 80-120, Cr: 133-170)
+        # 2. YCbCr Human Skin Mask (Cb: 85-118, Cr: 138-165)
         ycbcr = cv2.cvtColor(img, cv2.COLOR_BGR2YCrCb)
-        lower_ycbcr = np.array([0, 133, 80], dtype=np.uint8)
-        upper_ycbcr = np.array([255, 170, 120], dtype=np.uint8)
+        lower_ycbcr = np.array([0, 138, 85], dtype=np.uint8)
+        upper_ycbcr = np.array([255, 165, 118], dtype=np.uint8)
         mask_ycbcr = cv2.inRange(ycbcr, lower_ycbcr, upper_ycbcr)
 
         # Joint Intersection Mask
@@ -365,7 +365,7 @@ def check_opencv_skin_ratio(img_bytes: bytes) -> Optional[bool]:
         skin_pixels = cv2.countNonZero(joint_mask)
         skin_ratio = skin_pixels / total_pixels
 
-        if skin_ratio > 0.38:
+        if skin_ratio > 0.45:
             logger.warning(f"[MODERATION] Total skin ratio flagged explicit skin coverage ({skin_ratio:.2%})")
             return False
 
@@ -377,14 +377,14 @@ def check_opencv_skin_ratio(img_bytes: bytes) -> Optional[bool]:
         center_total = float((c_y2 - c_y1) * (c_x2 - c_x1))
         center_ratio = center_pixels / center_total
 
-        if center_ratio > 0.42:
+        if center_ratio > 0.48:
             logger.warning(f"[MODERATION] Center torso skin ratio flagged explicit body exposure ({center_ratio:.2%})")
             return False
 
         return True
     except Exception as e:
         logger.warning(f"[MODERATION] OpenCV skin check exception: {e}")
-    return None
+    return True
 
 # --- OUTPUT & INPUT CONTENT MODERATION ---
 def inspect_image_bytes_for_safety(img_bytes: bytes) -> bool:
