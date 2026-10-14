@@ -1581,31 +1581,33 @@ async def process_i2v_production(job_id: str, prompt: str, image_path: str):
         logger.warning(f"[FAST_VIDEO_ENGINE] Exception: {e}")
     return None
 def run_pollinations_fallback(prompt: str, job_id: str) -> Optional[str]:
-    logger.info("[IMAGE] Trying Pollinations fallback...")
+    logger.info("[IMAGE] Trying multi-model Pollinations engine...")
     encoded = requests.utils.quote(prompt)
-    url = f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=1024&nologo=true&model=flux"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
     }
-    try:
-        def _call_pollinations():
-            return requests.get(url, headers=headers, timeout=30)
-        res = retry_with_backoff(_call_pollinations)
-        if res.status_code == 200:
-            path = os.path.join(OUTPUT_DIR, f"{job_id}.jpg")
-            with open(path, "wb") as f:
-                f.write(res.content)
-            if verify_file(path):
-                if not output_moderation(path, is_video=False):
-                    logger.warning(f"[IMAGE] Pollinations fallback failed output moderation for {job_id}")
-                    if os.path.exists(path):
-                        try: os.remove(path)
-                        except: pass
-                    return None
-                return f"/api/outputs/{job_id}.jpg"
-    except Exception as e:
-        logger.warning(f"[IMAGE] Pollinations Exception: {e}")
+    models = ["flux", "turbo", "flux-realism"]
+    for model in models:
+        url = f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=1024&nologo=true&model={model}"
+        try:
+            def _call_pollinations():
+                return requests.get(url, headers=headers, timeout=20)
+            res = retry_with_backoff(_call_pollinations)
+            if res.status_code == 200 and len(res.content) > 1000:
+                path = os.path.join(OUTPUT_DIR, f"{job_id}.jpg")
+                with open(path, "wb") as f:
+                    f.write(res.content)
+                if verify_file(path):
+                    if not output_moderation(path, is_video=False):
+                        logger.warning(f"[IMAGE] Pollinations ({model}) failed output moderation for {job_id}")
+                        if os.path.exists(path):
+                            try: os.remove(path)
+                            except: pass
+                        return None
+                    return f"/api/outputs/{job_id}.jpg"
+        except Exception as e:
+            logger.warning(f"[IMAGE] Pollinations ({model}) Exception: {e}")
     return None
 
 def run_image_gen_gradio(cand: dict, prompt: str) -> Optional[str]:
@@ -1830,6 +1832,57 @@ def run_exact_image_motion_engine(prompt: str, image_path: str, job_id: str) -> 
         logger.warning(f"[EXACT_I2V_ENGINE] Exception: {e}")
     return None
 
+def run_replicate_t2i(prompt: str, job_id: str) -> Optional[str]:
+    api_key = get_replicate_api_key()
+    if not api_key:
+        return None
+    try:
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+            "User-Agent": "RakaAI/1.0"
+        }
+        payload = {
+            "version": "black-forest-labs/flux-schnell",
+            "input": {
+                "prompt": prompt,
+                "go_fast": True,
+                "megapixels": "1",
+                "num_outputs": 1,
+                "aspect_ratio": "1:1",
+                "output_format": "webp"
+            }
+        }
+        res = requests.post("https://api.replicate.com/v1/predictions", headers=headers, json=payload, timeout=20)
+        if res.status_code == 201:
+            data = res.json()
+            poll_url = data.get("urls", {}).get("get")
+            if poll_url:
+                for _ in range(12):
+                    time.sleep(2)
+                    p_res = requests.get(poll_url, headers=headers, timeout=10)
+                    if p_res.status_code == 200:
+                        p_data = p_res.json()
+                        status = p_data.get("status")
+                        if status == "succeeded":
+                            output = p_data.get("output")
+                            img_url = output[0] if isinstance(output, list) else output
+                            if img_url:
+                                local_url = download_file(img_url, job_id, ext=".webp")
+                                expected_path = os.path.join(OUTPUT_DIR, f"{job_id}.webp")
+                                if local_url and verify_file(expected_path):
+                                    if not output_moderation(expected_path, is_video=False):
+                                        if os.path.exists(expected_path):
+                                            try: os.remove(expected_path)
+                                            except: pass
+                                        return None
+                                    return local_url
+                        elif status in ("failed", "canceled"):
+                            break
+    except Exception as e:
+        logger.warning(f"[REPLICATE_T2I] Exception: {e}")
+    return None
+
 # --- A. PROMPT -> IMAGE ---
 @app.post("/api/prompt-to-image")
 async def api_p2i(
@@ -1856,7 +1909,7 @@ async def api_p2i(
     final_prompt = f"{input_prompt}, {input_style} style, masterpiece, cinematic"
     logger.info(f"[IMAGE] New Request: {final_prompt}")
 
-    # 1. Try Pollinations First (Ultra-fast 2-second generation)
+    # 1. Try Pollinations First (Ultra-fast 2-second multi-model engine)
     local_url = run_pollinations_fallback(final_prompt, job_id)
     if local_url:
         expected_img_path = os.path.join(OUTPUT_DIR, f"{job_id}.jpg")
@@ -1872,10 +1925,16 @@ async def api_p2i(
                         "message": "This request can't be generated because it doesn't meet our content safety guidelines."
                     }
                 )
-        logger.info(f"[IMAGE] FAST SUCCESS on Pollinations Flux for {job_id}")
+        logger.info(f"[IMAGE] FAST SUCCESS on Pollinations for {job_id}")
         return {"success": True, "job_id": job_id, "url": local_url, "result_url": local_url}
 
-    # 2. Try HF candidates if Pollinations fails
+    # 2. Try Replicate T2I (Flux Schnell)
+    rep_url = run_replicate_t2i(final_prompt, job_id)
+    if rep_url:
+        logger.info(f"[IMAGE] SUCCESS on Replicate Flux for {job_id}")
+        return {"success": True, "job_id": job_id, "url": rep_url, "result_url": rep_url}
+
+    # 3. Try HF candidates
     for cand in IMAGE_CANDIDATES:
         try:
             temp = run_image_gen_gradio(cand, final_prompt)
