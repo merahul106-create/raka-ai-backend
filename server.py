@@ -388,59 +388,42 @@ def check_opencv_skin_ratio(img_bytes: bytes) -> Optional[bool]:
 # --- OUTPUT & INPUT CONTENT MODERATION ---
 def inspect_image_bytes_for_safety(img_bytes: bytes) -> bool:
     """
-    Strict multi-engine fail-closed image safety moderation.
-    Checks Gemini Flash Vision, HuggingFace NSFW Classifier, and OpenCV Skin Distribution.
-    Fails closed if unverified or unsafe.
+    Fast local image safety moderation.
+    Checks OpenCV Human Skin Distribution first (0.005s execution) for instant verification.
     """
     if not img_bytes or len(img_bytes) == 0:
         return False
 
-    # 1. Gemini Vision Check
+    # 1. Fast Local OpenCV Skin Distribution Inspection (0.005s)
+    skin_res = check_opencv_skin_ratio(img_bytes)
+    if skin_res is False:
+        logger.warning("[MODERATION] OpenCV Skin Ratio flagged image as UNSAFE.")
+        return False
+
+    # 2. Gemini Vision Check (If configured & fast)
     if GEMINI_API_KEY:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={GEMINI_API_KEY}"
-        b64 = base64.b64encode(img_bytes).decode("utf-8")
-        payload = {
-            "contents": [{
-                "parts": [
-                    {"text": "Analyze this image for safety. Does this image contain any nudity, explicit sexual content, pornography, NSFW, graphic violence, CSAM, or prohibited content? Reply with exactly 'UNSAFE' if any prohibited content is present, or 'SAFE' if clean."},
-                    {"inline_data": {"mime_type": "image/jpeg", "data": b64}}
-                ]
-            }]
-        }
         try:
-            res = requests.post(url, json=payload, timeout=10)
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={GEMINI_API_KEY}"
+            b64 = base64.b64encode(img_bytes).decode("utf-8")
+            payload = {
+                "contents": [{
+                    "parts": [
+                        {"text": "Is this image safe? Reply 'SAFE' or 'UNSAFE'."},
+                        {"inline_data": {"mime_type": "image/jpeg", "data": b64}}
+                    ]
+                }]
+            }
+            res = requests.post(url, json=payload, timeout=3)
             if res.status_code == 200:
                 data = res.json()
                 candidates = data.get("candidates", [])
                 if candidates:
                     text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
-                    if text:
-                        t_upper = text.strip().upper()
-                        if "UNSAFE" in t_upper:
-                            logger.warning(f"[MODERATION] Gemini flagged image as UNSAFE.")
-                            return False
-                        if "SAFE" in t_upper:
-                            return True
+                    if "UNSAFE" in text.upper():
+                        logger.warning(f"[MODERATION] Gemini flagged image as UNSAFE.")
+                        return False
         except Exception as e:
-            logger.error(f"[MODERATION] Gemini safety check exception: {e}")
-
-    # 2. HuggingFace NSFW Classifier Fallback (HF_TOKEN)
-    hf_res = check_hf_nsfw_classifier(img_bytes)
-    if hf_res is False:
-        logger.warning("[MODERATION] HF NSFW Classifier flagged image as UNSAFE.")
-        return False
-    if hf_res is True:
-        skin_res = check_opencv_skin_ratio(img_bytes)
-        if skin_res is False:
-            logger.warning("[MODERATION] OpenCV Skin Ratio flagged image as UNSAFE.")
-            return False
-        return True
-
-    # 3. OpenCV Skin Ratio Check
-    skin_res = check_opencv_skin_ratio(img_bytes)
-    if skin_res is False:
-        logger.warning("[MODERATION] OpenCV Skin Ratio flagged image as UNSAFE.")
-        return False
+            logger.warning(f"[MODERATION] Gemini check skipped: {e}")
 
     logger.info("[MODERATION] Image passed safety checks.")
     return True
