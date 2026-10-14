@@ -17,6 +17,7 @@ import cv2
 import re
 import math
 import numpy as np
+import urllib.parse
 from typing import Optional, Tuple
 from huggingface_hub import InferenceClient
 from gradio_client import Client, handle_file
@@ -1232,7 +1233,7 @@ def run_i2v_gradio(candidate: dict, prompt: str, image_path: str, job_id: str) -
 
 def run_guaranteed_pollinations_direct(prompt: str, job_id: str) -> Optional[str]:
     clean_prompt = prompt.strip() if prompt else "A majestic masterpiece"
-    encoded = requests.utils.quote(clean_prompt[:200])
+    encoded = urllib.parse.quote_plus(clean_prompt[:200])
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
     seed = random.randint(1, 999999)
     out_path = os.path.join(OUTPUT_DIR, f"{job_id}.jpg")
@@ -1291,7 +1292,7 @@ def run_guaranteed_ai_video_engine(prompt: str, job_id: str, input_image_path: O
 
         for stage in needed_stages:
             stage_prompt = f"{prompt}, {stage}"
-            encoded = requests.utils.quote(stage_prompt[:150])
+            encoded = urllib.parse.quote_plus(stage_prompt[:150])
             url = f"https://image.pollinations.ai/prompt/{encoded}?width={width}&height={height}&nologo=true&negative=nudity,nsfw,sexual&seed={random.randint(1, 999999)}"
             try:
                 res = requests.get(url, headers=headers, timeout=12)
