@@ -142,6 +142,7 @@ def retry_with_backoff(func, *args, max_retries=3, initial_delay=1.0, max_delay=
 T2V_CANDIDATES = [
     {"url": "Lightricks/ltx-video-distilled", "type": "ltx"},
     {"url": "Wan-AI/Wan2.1", "type": "wan21"},
+    {"url": "THUDM/CogVideoX-5B-Space", "type": "cogvideox"},
 ]
 
 I2V_CANDIDATES = [
@@ -1018,6 +1019,12 @@ def run_t2v_gradio(prompt: str, candidate: dict, job_id: str) -> dict:
                     False,
                     -1,
                     api_name="/t2v_generation_async"
+                )
+            elif candidate["type"] == "cogvideox":
+                logger.info(f"[T2V] [{provider_name}] Calling /generate...")
+                return client.predict(
+                    prompt,
+                    api_name="/generate"
                 )
             return {"error": "Unsupported Type", "details": candidate["type"]}
 
