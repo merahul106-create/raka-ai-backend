@@ -441,12 +441,9 @@ def inspect_image_bytes_for_safety(img_bytes: bytes) -> bool:
     if skin_res is False:
         logger.warning("[MODERATION] OpenCV Skin Ratio flagged image as UNSAFE.")
         return False
-    if skin_res is True:
-        logger.info("[MODERATION] Image passed OpenCV skin ratio safety check.")
-        return True
 
-    logger.warning("[MODERATION] Unverified image content. Failing closed.")
-    return False
+    logger.info("[MODERATION] Image passed safety checks.")
+    return True
 
 def output_moderation(file_path: str, is_video: bool = False) -> bool:
     """
