@@ -1251,22 +1251,22 @@ def run_guaranteed_pollinations_direct(prompt: str, job_id: str) -> Optional[str
     clean_prompt = prompt.strip() if prompt else "A majestic masterpiece"
     encoded = requests.utils.quote(clean_prompt[:200])
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+    seed = random.randint(1, 999999)
 
-    for seed in [random.randint(1, 999999), random.randint(1, 999999), 42]:
-        try:
-            url = f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=1024&nologo=true&negative=nudity,nsfw,sexual,erotic,breasts,genitalia,cleavage,lingerie&seed={seed}"
-            res = requests.get(url, headers=headers, timeout=20)
-            if res.status_code == 200 and len(res.content) > 5000:
-                if inspect_image_bytes_for_safety(res.content):
-                    out_path = os.path.join(OUTPUT_DIR, f"{job_id}.jpg")
-                    with open(out_path, "wb") as f:
-                        f.write(res.content)
-                    if verify_file(out_path):
-                        if output_moderation(out_path, is_video=False):
-                            logger.info(f"[GUARANTEED_IMAGE] Generated real AI image for {job_id} via Pollinations Direct")
-                            return f"/api/outputs/{job_id}.jpg"
-        except Exception as e:
-            logger.warning(f"[GUARANTEED_IMAGE] Seed {seed} failed: {e}")
+    try:
+        url = f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=1024&nologo=true&negative=nudity,nsfw,sexual,erotic,breasts,genitalia,cleavage,lingerie&seed={seed}"
+        res = requests.get(url, headers=headers, timeout=8)
+        if res.status_code == 200 and len(res.content) > 5000:
+            if inspect_image_bytes_for_safety(res.content):
+                out_path = os.path.join(OUTPUT_DIR, f"{job_id}.jpg")
+                with open(out_path, "wb") as f:
+                    f.write(res.content)
+                if verify_file(out_path):
+                    if output_moderation(out_path, is_video=False):
+                        logger.info(f"[GUARANTEED_IMAGE] Generated real AI image for {job_id} via Pollinations Direct")
+                        return f"/api/outputs/{job_id}.jpg"
+    except Exception as e:
+        logger.warning(f"[GUARANTEED_IMAGE] Fast fetch failed: {e}")
     return None
 
 def run_guaranteed_ai_video_engine(prompt: str, job_id: str, input_image_path: Optional[str] = None) -> Optional[str]:
