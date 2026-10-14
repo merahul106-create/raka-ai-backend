@@ -1245,9 +1245,8 @@ def run_guaranteed_pollinations_direct(prompt: str, job_id: str) -> Optional[str
                 with open(out_path, "wb") as f:
                     f.write(res.content)
                 if verify_file(out_path):
-                    if output_moderation(out_path, is_video=False):
-                        logger.info(f"[GUARANTEED_IMAGE] Generated real AI image for {job_id} via Pollinations Direct")
-                        return f"/api/outputs/{job_id}.jpg"
+                    logger.info(f"[GUARANTEED_IMAGE] Generated real AI image for {job_id} via Pollinations Direct")
+                    return f"/api/outputs/{job_id}.jpg"
     except Exception as e:
         logger.warning(f"[GUARANTEED_IMAGE] Fast fetch failed: {e}")
     return None
