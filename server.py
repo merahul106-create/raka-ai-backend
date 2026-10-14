@@ -318,20 +318,37 @@ def check_hf_nsfw_classifier(img_bytes: bytes) -> Optional[bool]:
     return None
 
 def check_opencv_skin_ratio(img_bytes: bytes) -> Optional[bool]:
+    """
+    Joint YCbCr + HSV human skin segmentation heuristic.
+    Requires skin match across BOTH color spaces to avoid false positives on red cars, sunsets, and golden lighting.
+    Flags as UNSAFE only if joint human skin coverage exceeds 60%.
+    """
     try:
         nparr = np.frombuffer(img_bytes, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         if img is None:
             return None
+
+        # 1. HSV Skin Mask
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        lower_skin = np.array([0, 20, 70], dtype=np.uint8)
-        upper_skin = np.array([20, 255, 255], dtype=np.uint8)
-        mask = cv2.inRange(hsv, lower_skin, upper_skin)
-        skin_pixels = cv2.countNonZero(mask)
+        lower_hsv = np.array([0, 30, 60], dtype=np.uint8)
+        upper_hsv = np.array([20, 180, 255], dtype=np.uint8)
+        mask_hsv = cv2.inRange(hsv, lower_hsv, upper_hsv)
+
+        # 2. YCbCr Human Skin Mask (Cb: 77-127, Cr: 133-173)
+        ycbcr = cv2.cvtColor(img, cv2.COLOR_BGR2YCrCb)
+        lower_ycbcr = np.array([0, 133, 77], dtype=np.uint8)
+        upper_ycbcr = np.array([255, 173, 127], dtype=np.uint8)
+        mask_ycbcr = cv2.inRange(ycbcr, lower_ycbcr, upper_ycbcr)
+
+        # Joint Intersection Mask
+        joint_mask = cv2.bitwise_and(mask_hsv, mask_ycbcr)
+        skin_pixels = cv2.countNonZero(joint_mask)
         total_pixels = img.shape[0] * img.shape[1]
         skin_ratio = skin_pixels / float(total_pixels)
-        if skin_ratio > 0.38:
-            logger.warning(f"[MODERATION] OpenCV Skin Ratio flagged suspicious skin coverage ({skin_ratio:.2%})")
+
+        if skin_ratio > 0.60:
+            logger.warning(f"[MODERATION] Joint YCbCr+HSV Skin Ratio flagged explicit nudity/skin coverage ({skin_ratio:.2%})")
             return False
         return True
     except Exception as e:
