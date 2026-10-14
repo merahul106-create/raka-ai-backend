@@ -319,8 +319,9 @@ def check_hf_nsfw_classifier(img_bytes: bytes) -> Optional[bool]:
 
 def check_opencv_skin_ratio(img_bytes: bytes) -> Optional[bool]:
     """
-    Strict YCbCr + HSV human skin segmentation heuristic.
-    Flags as UNSAFE if total skin coverage exceeds 22% or if center torso skin coverage exceeds 25%.
+    Joint YCbCr + HSV human skin segmentation heuristic.
+    Uses precise Cb/Cr skin color bounds and saturation limits to distinguish human skin from sunsets and warm lighting.
+    Flags as UNSAFE if total skin coverage exceeds 38% or if center torso skin coverage exceeds 42%.
     """
     try:
         nparr = np.frombuffer(img_bytes, np.uint8)
@@ -331,16 +332,16 @@ def check_opencv_skin_ratio(img_bytes: bytes) -> Optional[bool]:
         h, w, _ = img.shape
         total_pixels = float(h * w)
 
-        # 1. HSV Skin Mask
+        # 1. HSV Human Skin Mask (Saturation restricted to 20-160 to exclude hyper-saturated sunsets/cars)
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        lower_hsv = np.array([0, 25, 50], dtype=np.uint8)
-        upper_hsv = np.array([25, 200, 255], dtype=np.uint8)
+        lower_hsv = np.array([0, 20, 60], dtype=np.uint8)
+        upper_hsv = np.array([25, 160, 240], dtype=np.uint8)
         mask_hsv = cv2.inRange(hsv, lower_hsv, upper_hsv)
 
-        # 2. YCbCr Human Skin Mask (Cb: 77-127, Cr: 133-173)
+        # 2. YCbCr Human Skin Mask (Cb: 80-120, Cr: 133-170)
         ycbcr = cv2.cvtColor(img, cv2.COLOR_BGR2YCrCb)
-        lower_ycbcr = np.array([0, 133, 77], dtype=np.uint8)
-        upper_ycbcr = np.array([255, 173, 127], dtype=np.uint8)
+        lower_ycbcr = np.array([0, 133, 80], dtype=np.uint8)
+        upper_ycbcr = np.array([255, 170, 120], dtype=np.uint8)
         mask_ycbcr = cv2.inRange(ycbcr, lower_ycbcr, upper_ycbcr)
 
         # Joint Intersection Mask
@@ -348,8 +349,8 @@ def check_opencv_skin_ratio(img_bytes: bytes) -> Optional[bool]:
         skin_pixels = cv2.countNonZero(joint_mask)
         skin_ratio = skin_pixels / total_pixels
 
-        if skin_ratio > 0.22:
-            logger.warning(f"[MODERATION] Total skin ratio flagged inappropriate skin coverage ({skin_ratio:.2%})")
+        if skin_ratio > 0.38:
+            logger.warning(f"[MODERATION] Total skin ratio flagged explicit skin coverage ({skin_ratio:.2%})")
             return False
 
         # 3. Center Torso Region Inspection (25%-75% width, 20%-80% height)
@@ -360,8 +361,8 @@ def check_opencv_skin_ratio(img_bytes: bytes) -> Optional[bool]:
         center_total = float((c_y2 - c_y1) * (c_x2 - c_x1))
         center_ratio = center_pixels / center_total
 
-        if center_ratio > 0.25:
-            logger.warning(f"[MODERATION] Center torso skin ratio flagged inappropriate body exposure ({center_ratio:.2%})")
+        if center_ratio > 0.42:
+            logger.warning(f"[MODERATION] Center torso skin ratio flagged explicit body exposure ({center_ratio:.2%})")
             return False
 
         return True
