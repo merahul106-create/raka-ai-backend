@@ -700,8 +700,16 @@ def generate_local_fallback_video(job_id: str, prompt: str, image_path: Optional
         out.write(frame)
 
     out.release()
-    logger.info(f"[FALLBACK_VIDEO] Generated local fallback MP4 video at {output_path}")
-    return f"/api/outputs/{job_id}.mp4"
+    if verify_file(output_path):
+        if not output_moderation(output_path, is_video=True):
+            logger.warning(f"[FALLBACK_VIDEO] Output fallback video failed safety moderation for {job_id}")
+            if os.path.exists(output_path):
+                try: os.remove(output_path)
+                except: pass
+            return None
+        logger.info(f"[FALLBACK_VIDEO] Generated local fallback MP4 video at {output_path}")
+        return f"/api/outputs/{job_id}.mp4"
+    return None
 
 # --- GEMINI AI SERVICES ---
 def analyze_with_gemini(prompt_text: str, image_bytes: Optional[bytes] = None, mime_type: str = "image/jpeg") -> Optional[str]:
@@ -1810,6 +1818,12 @@ def run_exact_image_motion_engine(prompt: str, image_path: str, job_id: str) -> 
         out.release()
 
         if verify_file(output_path):
+            if not output_moderation(output_path, is_video=True):
+                logger.warning(f"[EXACT_I2V_ENGINE] Output video failed safety moderation for {job_id}")
+                if os.path.exists(output_path):
+                    try: os.remove(output_path)
+                    except: pass
+                return None
             logger.info(f"[EXACT_I2V_ENGINE] SUCCESS for {job_id} -> /api/outputs/{job_id}.mp4")
             return f"/api/outputs/{job_id}.mp4"
     except Exception as e:
