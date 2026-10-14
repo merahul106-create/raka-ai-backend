@@ -645,6 +645,70 @@ def download_file(url: str, job_id: str, ext: str = ".mp4") -> Optional[str]:
         logger.error(f"Download failed: {e}")
     return None
 
+def attach_tts_narration_to_video(video_path: str, prompt: str) -> bool:
+    """
+    Automatically generates prompt-matched AI voiceover narration using Google TTS
+    and merges it with the generated AI video, similar to Google Gemini / Google Flow.
+    """
+    if not video_path or not os.path.exists(video_path) or os.path.getsize(video_path) == 0:
+        return False
+
+    try:
+        clean_text = prompt.strip()
+        if not clean_text:
+            return False
+
+        # Limit narration prompt length to 200 chars for optimal audio timing
+        narration_text = clean_text[:200]
+        encoded_prompt = requests.utils.quote(narration_text)
+
+        tts_url = f"https://translate.google.com/translate_tts?ie=UTF-8&tl=en&q={encoded_prompt}&client=tw-ob"
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+
+        res = requests.get(tts_url, headers=headers, timeout=10)
+        if res.status_code != 200 or len(res.content) < 500:
+            logger.warning(f"[TTS_NARRATION] Google TTS request failed with status {res.status_code}")
+            return False
+
+        tts_path = video_path + "_tts.mp3"
+        merged_path = video_path + "_with_audio.mp4"
+
+        with open(tts_path, "wb") as f:
+            f.write(res.content)
+
+        ffmpeg_cmd = [
+            "ffmpeg", "-y",
+            "-i", video_path,
+            "-i", tts_path,
+            "-c:v", "copy",
+            "-c:a", "aac",
+            "-map", "0:v:0",
+            "-map", "1:a:0",
+            "-shortest",
+            merged_path
+        ]
+
+        ret = subprocess.run(ffmpeg_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=20)
+        if ret.returncode == 0 and os.path.exists(merged_path) and os.path.getsize(merged_path) > 0:
+            shutil.move(merged_path, video_path)
+            logger.info(f"[TTS_NARRATION] Successfully merged AI voiceover narration into video: {video_path}")
+            if os.path.exists(tts_path):
+                try: os.remove(tts_path)
+                except: pass
+            return True
+
+        if os.path.exists(tts_path):
+            try: os.remove(tts_path)
+            except: pass
+        if os.path.exists(merged_path):
+            try: os.remove(merged_path)
+            except: pass
+
+    except Exception as e:
+        logger.warning(f"[TTS_NARRATION] Exception while generating/attaching voiceover: {e}")
+
+    return False
+
 
 
 # --- GEMINI AI SERVICES ---
@@ -924,6 +988,9 @@ def poll_replicate_and_complete(job_id: str, poll_url: str, api_key: str):
                     if not output_moderation(expected_file_path, is_video=True):
                         handle_output_moderation_failure(job_id, "Replicate/minimax")
                         return
+                    prompt_text = jobs.get(job_id, {}).get("prompt", "")
+                    if prompt_text:
+                        attach_tts_narration_to_video(expected_file_path, prompt_text)
                     update_job(
                         job_id,
                         status="completed",
@@ -1279,6 +1346,7 @@ def process_t2v_production_sync(job_id: str, prompt: str):
                 if not output_moderation(expected_file_path, is_video=True):
                     handle_output_moderation_failure(job_id, provider_id)
                     return
+                attach_tts_narration_to_video(expected_file_path, prompt)
                 logger.info(f"T2V_SUCCESS | Job: {job_id} | Provider: {provider_id}")
                 update_job(
                     job_id,
@@ -1359,6 +1427,7 @@ def process_i2v_production_sync(job_id: str, prompt: str, image_path: str):
                 if not output_moderation(expected_file_path, is_video=True):
                     handle_output_moderation_failure(job_id, provider_id)
                     return
+                attach_tts_narration_to_video(expected_file_path, prompt)
                 logger.info(f"I2V_SUCCESS | Job: {job_id} | Provider: {provider_id}")
                 update_job(
                     job_id,
