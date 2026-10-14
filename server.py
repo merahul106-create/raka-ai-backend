@@ -1875,7 +1875,13 @@ async def api_p2i(
     final_prompt = f"{input_prompt}, {input_style} style, masterpiece, cinematic"
     logger.info(f"[IMAGE] New Request: {final_prompt}")
 
-    # 1. Try Pollinations First (Ultra-fast 2-second multi-model engine)
+    # 1. Guaranteed Direct AI Image Generator (Instant 2-Second Generation)
+    direct_url = run_guaranteed_pollinations_direct(final_prompt, job_id)
+    if direct_url:
+        logger.info(f"[IMAGE] FAST SUCCESS on Guaranteed Pollinations Direct for {job_id}")
+        return {"success": True, "job_id": job_id, "url": direct_url, "result_url": direct_url}
+
+    # 2. Try Pollinations Multi-Model Fallback
     local_url = run_pollinations_fallback(final_prompt, job_id)
     if local_url:
         expected_img_path = os.path.join(OUTPUT_DIR, f"{job_id}.jpg")
@@ -1894,13 +1900,13 @@ async def api_p2i(
         logger.info(f"[IMAGE] FAST SUCCESS on Pollinations for {job_id}")
         return {"success": True, "job_id": job_id, "url": local_url, "result_url": local_url}
 
-    # 2. Try Replicate T2I (Flux Schnell)
+    # 3. Try Replicate T2I (Flux Schnell)
     rep_url = run_replicate_t2i(final_prompt, job_id)
     if rep_url:
         logger.info(f"[IMAGE] SUCCESS on Replicate Flux for {job_id}")
         return {"success": True, "job_id": job_id, "url": rep_url, "result_url": rep_url}
 
-    # 3. Try HF candidates
+    # 4. Try HF candidates
     for cand in IMAGE_CANDIDATES:
         try:
             temp = run_image_gen_gradio(cand, final_prompt)
@@ -1914,12 +1920,6 @@ async def api_p2i(
                     return {"success": True, "job_id": job_id, "url": local_url, "result_url": local_url}
         except Exception as e:
             logger.warning(f"[IMAGE] {cand['url']} failed: {e}")
-
-    # 4. Guaranteed Pollinations Direct Image Generator
-    direct_url = run_guaranteed_pollinations_direct(final_prompt, job_id)
-    if direct_url:
-        logger.info(f"[IMAGE] SUCCESS on Guaranteed Pollinations Direct for {job_id}")
-        return {"success": True, "job_id": job_id, "url": direct_url, "result_url": direct_url}
 
     return JSONResponse(status_code=503, content={
         "success": False,
