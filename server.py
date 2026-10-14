@@ -380,19 +380,25 @@ def inspect_image_bytes_for_safety(img_bytes: bytes) -> bool:
     # 2. HuggingFace NSFW Classifier Fallback (HF_TOKEN)
     hf_res = check_hf_nsfw_classifier(img_bytes)
     if hf_res is False:
+        logger.warning("[MODERATION] HF NSFW Classifier flagged image as UNSAFE.")
         return False
     if hf_res is True:
         skin_res = check_opencv_skin_ratio(img_bytes)
         if skin_res is False:
+            logger.warning("[MODERATION] OpenCV Skin Ratio flagged image as UNSAFE.")
             return False
         return True
 
     # 3. OpenCV Skin Ratio Check
     skin_res = check_opencv_skin_ratio(img_bytes)
     if skin_res is False:
+        logger.warning("[MODERATION] OpenCV Skin Ratio flagged image as UNSAFE.")
         return False
+    if skin_res is True:
+        logger.info("[MODERATION] Image passed OpenCV skin ratio safety check.")
+        return True
 
-    logger.warning("[MODERATION] No safety checkers verified image safety. Failing closed.")
+    logger.warning("[MODERATION] Unverified image content. Failing closed.")
     return False
 
 def output_moderation(file_path: str, is_video: bool = False) -> bool:
