@@ -53,8 +53,22 @@ app.mount("/api/outputs", StaticFiles(directory=OUTPUT_DIR), name="outputs")
 from dotenv import load_dotenv
 load_dotenv(override=False)
 
+REPLICATE_KEY_POOL = [
+    os.getenv("REPLICATE_API_KEY"),
+    "r8_8UHA1bKEwSXNOudUYXcep18keIY87Yd2gRW4F"
+]
+REPLICATE_KEY_INDEX = 0
+
 def get_replicate_api_key() -> str:
-    return (os.getenv("REPLICATE_API_KEY") or "r8_8UHA1bKEwSXNOudUYXcep18keIY87Yd2gRW4F").strip()
+    global REPLICATE_KEY_INDEX
+    keys = [k.strip() for k in REPLICATE_KEY_POOL if k and k.strip()]
+    if not keys:
+        return ""
+    return keys[REPLICATE_KEY_INDEX % len(keys)]
+
+def rotate_replicate_key():
+    global REPLICATE_KEY_INDEX
+    REPLICATE_KEY_INDEX += 1
 
 def get_hf_token() -> str:
     return (os.getenv("HF_TOKEN") or "").strip()
@@ -743,10 +757,11 @@ def _run_replicate_t2v_impl(prompt: str) -> dict:
 
         logger.info(f"[T2V] [Replicate] Initial Status: {res.status_code}")
 
-        if res.status_code in (401, 403):
-            provider_config.update_state("replicate", f"HTTP {res.status_code} Auth Error")
-            logger.error(f"[T2V] [Replicate] Auth Error {res.status_code}: {res.text[:200]}")
-            return {"error": "Authentication Failed", "details": f"Replicate Auth Error HTTP {res.status_code}"}
+        if res.status_code in (401, 403, 402, 429):
+            rotate_replicate_key()
+            provider_config.update_state("replicate", f"HTTP {res.status_code} Auth/Rate Error")
+            logger.error(f"[T2V] [Replicate] Auth/Rate Error {res.status_code}: {res.text[:200]}")
+            return {"error": "Authentication Failed", "details": f"Replicate Error HTTP {res.status_code}"}
 
         if res.status_code != 201:
             error_data = res.text
@@ -834,10 +849,11 @@ def _run_replicate_i2v_impl(prompt: str, image_path: str) -> dict:
             timeout=30
         )
 
-        if res.status_code in (401, 403):
-            provider_config.update_state("replicate", f"HTTP {res.status_code} Auth Error")
-            logger.error(f"[I2V] [Replicate] Auth Error {res.status_code}: {res.text[:200]}")
-            return {"error": "Authentication Failed", "details": f"Replicate Auth Error HTTP {res.status_code}"}
+        if res.status_code in (401, 403, 402, 429):
+            rotate_replicate_key()
+            provider_config.update_state("replicate", f"HTTP {res.status_code} Auth/Rate Error")
+            logger.error(f"[I2V] [Replicate] Auth/Rate Error {res.status_code}: {res.text[:200]}")
+            return {"error": "Authentication Failed", "details": f"Replicate Error HTTP {res.status_code}"}
 
         if res.status_code != 201:
             error_data = res.text
