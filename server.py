@@ -1696,17 +1696,11 @@ async def api_p2i(
         except Exception as e:
             logger.warning(f"[IMAGE] {cand['url']} failed: {e}")
 
-    # 4. Guaranteed Local Fallback Engine
-    fallback_url = generate_local_fallback_image(final_prompt, job_id)
-    if fallback_url:
-        logger.info(f"[IMAGE] SUCCESS on Guaranteed Local Fallback for {job_id}")
-        return {"success": True, "job_id": job_id, "url": fallback_url, "result_url": fallback_url}
-
     return JSONResponse(status_code=503, content={
         "success": False,
         "error_type": "QUOTA_ERROR",
         "error": "IMAGE_QUOTA",
-        "message": "All image engines are currently busy. Please try again in a moment."
+        "message": "All real AI image generation engines are currently busy. Please try again in a moment."
     })
 
 async def parse_video_request_data(
