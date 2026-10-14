@@ -1050,7 +1050,7 @@ def run_t2v_gradio(prompt: str, candidate: dict, job_id: str) -> dict:
     logger.info(f"[T2V] [{provider_name}] Connecting to {candidate['url']}...")
 
     try:
-        client = create_gradio_client(candidate["url"], timeout=90)
+        client = create_gradio_client(candidate["url"], timeout=15)
 
         def _predict_t2v():
             if candidate["type"] == "ltx":
@@ -1135,7 +1135,7 @@ def run_i2v_gradio(candidate: dict, prompt: str, image_path: str, job_id: str) -
     logger.info(f"[I2V] [{provider_name}] Connecting to {candidate['url']}...")
 
     try:
-        client = create_gradio_client(candidate["url"], timeout=90)
+        client = create_gradio_client(candidate["url"], timeout=15)
 
         def _predict_i2v():
             if candidate["type"] == "wan22_lightning":
