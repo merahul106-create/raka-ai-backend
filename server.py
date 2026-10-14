@@ -1248,13 +1248,13 @@ def run_i2v_gradio(candidate: dict, prompt: str, image_path: str, job_id: str) -
         return {"error": "Provider Exception", "details": error_msg[:200]}
 
 def run_guaranteed_pollinations_direct(prompt: str, job_id: str) -> Optional[str]:
-    safe_prompt = f"{prompt} --negative nudity,nude,naked,nsfw,sexual,erotic,breasts,genitalia,cleavage,lingerie,see-through,underwear,inappropriate,pornographic"
-    encoded = requests.utils.quote(safe_prompt)
+    clean_prompt = prompt.strip() if prompt else "A majestic masterpiece"
+    encoded = requests.utils.quote(clean_prompt[:200])
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 
     for seed in [random.randint(1, 999999), random.randint(1, 999999), 42]:
         try:
-            url = f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=1024&nologo=true&seed={seed}"
+            url = f"https://image.pollinations.ai/prompt/{encoded}?width=1024&height=1024&nologo=true&negative=nudity,nsfw,sexual,erotic,breasts,genitalia,cleavage,lingerie&seed={seed}"
             res = requests.get(url, headers=headers, timeout=20)
             if res.status_code == 200 and len(res.content) > 5000:
                 if inspect_image_bytes_for_safety(res.content):
@@ -1293,7 +1293,7 @@ def run_guaranteed_ai_video_engine(prompt: str, job_id: str, input_image_path: O
         for stage in needed_stages:
             stage_prompt = f"{prompt}, {stage}"
             encoded = requests.utils.quote(stage_prompt[:150])
-            url = f"https://image.pollinations.ai/prompt/{encoded}?width={width}&height={height}&nologo=true&seed={random.randint(1, 999999)}"
+            url = f"https://image.pollinations.ai/prompt/{encoded}?width={width}&height={height}&nologo=true&negative=nudity,nsfw,sexual&seed={random.randint(1, 999999)}"
             try:
                 res = requests.get(url, headers=headers, timeout=12)
                 if res.status_code == 200 and len(res.content) > 5000:
