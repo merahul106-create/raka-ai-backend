@@ -1209,19 +1209,17 @@ def run_guaranteed_ai_video_engine(prompt: str, job_id: str, input_image_path: O
 
         motion_stages = [
             "masterpiece cinematic shot",
-            "action dynamic motion movement",
-            "detailed dramatic climax motion",
-            "cinematic beautiful final frame"
+            "action dynamic motion movement"
         ]
 
         needed_stages = motion_stages if len(keyframes) == 0 else motion_stages[1:]
 
         for stage in needed_stages:
             stage_prompt = f"{prompt}, {stage}"
-            encoded = urllib.parse.quote_plus(stage_prompt[:150])
+            encoded = urllib.parse.quote_plus(stage_prompt[:120])
             url = f"https://image.pollinations.ai/prompt/{encoded}?width={width}&height={height}&nologo=true&negative=nudity,nsfw,sexual&seed={random.randint(1, 999999)}"
             try:
-                res = requests.get(url, headers=headers, timeout=12)
+                res = requests.get(url, headers=headers, timeout=5)
                 if res.status_code == 200 and len(res.content) > 5000:
                     img_np = np.frombuffer(res.content, np.uint8)
                     decoded = cv2.imdecode(img_np, cv2.IMREAD_COLOR)
