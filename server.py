@@ -44,7 +44,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-OUTPUT_DIR = "outputs"
+OUTPUT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "outputs"))
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 JOBS_DB_PATH = os.path.join(OUTPUT_DIR, "jobs_db.json")
 
