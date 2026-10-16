@@ -555,19 +555,29 @@ def download_file(url: str, job_id: str, ext: str = ".mp4") -> Optional[str]:
 def attach_tts_narration_to_video(video_path: str, prompt: str) -> bool:
     """
     Automatically generates prompt-matched AI voiceover narration using Google TTS
-    and merges it with the generated AI video, similar to Google Gemini / Google Flow.
+    and merges it with the generated AI video with seamless duration syncing, similar to Google Gemini / Google Flow.
     """
     if not video_path or not os.path.exists(video_path) or os.path.getsize(video_path) == 0:
         return False
 
     try:
-        clean_text = prompt.strip()
-        if not clean_text:
+        raw_text = prompt.strip()
+        if not raw_text:
             return False
+
+        # Clean technical prompt keywords to produce natural AI voiceover narration
+        clean_text = re.sub(
+            r'(?i),\s*(realistic style|masterpiece|cinematic|photorealistic|hyperrealistic|8k|4k|best quality|trending on artstation|unreal engine|ultra detailed|high quality).*$',
+            '',
+            raw_text
+        ).strip()
+
+        if not clean_text:
+            clean_text = raw_text
 
         # Limit narration prompt length to 200 chars for optimal audio timing
         narration_text = clean_text[:200]
-        encoded_prompt = requests.utils.quote(narration_text)
+        encoded_prompt = urllib.parse.quote_plus(narration_text)
 
         tts_url = f"https://translate.google.com/translate_tts?ie=UTF-8&tl=en&q={encoded_prompt}&client=tw-ob"
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
@@ -583,22 +593,25 @@ def attach_tts_narration_to_video(video_path: str, prompt: str) -> bool:
         with open(tts_path, "wb") as f:
             f.write(res.content)
 
+        # Merge video and TTS audio track with seamless video looping (-stream_loop -1) and exact duration sync (-shortest)
         ffmpeg_cmd = [
             "ffmpeg", "-y",
+            "-stream_loop", "-1",
             "-i", video_path,
             "-i", tts_path,
-            "-c:v", "copy",
+            "-c:v", "libx264",
             "-c:a", "aac",
+            "-preset", "ultrafast",
             "-map", "0:v:0",
             "-map", "1:a:0",
             "-shortest",
             merged_path
         ]
 
-        ret = subprocess.run(ffmpeg_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=20)
+        ret = subprocess.run(ffmpeg_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=25)
         if ret.returncode == 0 and os.path.exists(merged_path) and os.path.getsize(merged_path) > 0:
             shutil.move(merged_path, video_path)
-            logger.info(f"[TTS_NARRATION] Successfully merged AI voiceover narration into video: {video_path}")
+            logger.info(f"[TTS_NARRATION] Successfully merged synced AI voiceover narration into video: {video_path}")
             if os.path.exists(tts_path):
                 try: os.remove(tts_path)
                 except: pass
