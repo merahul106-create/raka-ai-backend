@@ -1786,8 +1786,16 @@ async def api_p2i(
             return mod_res
 
     job_id = str(uuid.uuid4())
-    final_prompt = f"{input_prompt}, {input_style} style, masterpiece, cinematic"
-    logger.info(f"[IMAGE] New Request: {final_prompt}")
+    mascot_style_lock = (
+        "Raka, an original friendly robot-fox character, rounded white and violet body, "
+        "big glowing pink eyes, small antenna, soft glossy 3D look, cute but premium, "
+        "same character and proportions in every image, modern 3D illustration, soft studio lighting, "
+        "subtle glow, deep navy background #0B0B12 fading to dark violet, accents violet #7C5CFF and pink #C9308F, "
+        "square 1:1 format 1024x1024, subject centered with breathing room, "
+        "no text, no logos, no watermark, clean dark background"
+    )
+    final_prompt = f"{input_prompt}, {input_style} style, {mascot_style_lock}"
+    logger.info(f"[IMAGE] New Request with Mascot Style Lock: {final_prompt}")
 
     # 1. Guaranteed Direct AI Image Generator (Instant 2-Second Generation)
     direct_url = run_guaranteed_pollinations_direct(final_prompt, job_id)
