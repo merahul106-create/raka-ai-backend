@@ -990,7 +990,7 @@ def run_t2v_gradio(prompt: str, candidate: dict, job_id: str) -> dict:
     logger.info(f"[T2V] [{provider_name}] Connecting to {candidate['url']}...")
 
     try:
-        client = create_gradio_client(candidate["url"], timeout=15)
+        client = create_gradio_client(candidate["url"], timeout=120)
 
         def _predict_t2v():
             if candidate["type"] == "ltx":
@@ -1075,7 +1075,7 @@ def run_i2v_gradio(candidate: dict, prompt: str, image_path: str, job_id: str) -
     logger.info(f"[I2V] [{provider_name}] Connecting to {candidate['url']}...")
 
     try:
-        client = create_gradio_client(candidate["url"], timeout=15)
+        client = create_gradio_client(candidate["url"], timeout=120)
 
         def _predict_i2v():
             if candidate["type"] == "wan22_lightning":
@@ -1255,9 +1255,7 @@ def run_guaranteed_ai_video_engine(prompt: str, job_id: str, input_image_path: O
 
         if len(keyframes) == 1:
             img_0 = keyframes[0]
-            h_0, w_0, _ = img_0.shape
-            M = np.float32([[1.03, 0, -10], [0, 1.03, -10]])
-            img_1 = cv2.warpAffine(img_0, M, (w_0, h_0), borderMode=cv2.BORDER_REFLECT)
+            img_1 = cv2.convertScaleAbs(img_0, alpha=1.02, beta=3)
             keyframes.append(img_1)
 
         fps = 15
