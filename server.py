@@ -1278,6 +1278,7 @@ def process_t2v_production_sync(job_id: str, prompt: str):
                 if not output_moderation(expected_file_path, is_video=True):
                     handle_output_moderation_failure(job_id, provider_id)
                     return
+                attach_tts_narration_to_video(expected_file_path, prompt)
                 logger.info(f"T2V_SUCCESS | Job: {job_id} | Provider: {provider_id}")
                 update_job(
                     job_id,
@@ -1315,6 +1316,7 @@ def process_t2v_production_sync(job_id: str, prompt: str):
                             if not output_moderation(expected_file_path, is_video=True):
                                 handle_output_moderation_failure(job_id, provider_id)
                                 return
+                            attach_tts_narration_to_video(expected_file_path, prompt)
                             logger.info(f"T2V_SUCCESS | Job: {job_id} | Provider: {provider_id}")
                             update_job(
                                 job_id,
