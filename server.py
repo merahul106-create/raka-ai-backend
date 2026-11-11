@@ -1190,22 +1190,6 @@ def run_guaranteed_pollinations_direct(prompt: str, job_id: str) -> Optional[str
     except Exception as e:
         logger.warning(f"[GUARANTEED_IMAGE] Fast fetch failed: {e}")
 
-    try:
-        img_canvas = np.zeros((1024, 1024, 3), dtype=np.uint8)
-        for y in range(1024):
-            r_v = int(30 + 80 * math.sin(y / 1024.0 * math.pi))
-            g_v = int(40 + 90 * math.cos(y / 1024.0 * math.pi * 0.5))
-            b_v = int(100 + 110 * math.sin(y / 1024.0 * math.pi * 0.8))
-            img_canvas[y, :] = (b_v, g_v, r_v)
-        cv2.putText(img_canvas, "RAKA AI STUDIO", (60, 100), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 255), 3, cv2.LINE_AA)
-        cv2.putText(img_canvas, clean_prompt[:35], (60, 512), cv2.FONT_HERSHEY_SIMPLEX, 1.1, (255, 255, 255), 2, cv2.LINE_AA)
-        cv2.imwrite(out_path, img_canvas)
-        if verify_file(out_path):
-            logger.info(f"[GUARANTEED_IMAGE] Fallback image generated for {job_id}")
-            return f"/api/outputs/{job_id}.jpg"
-    except Exception as e:
-        logger.error(f"[GUARANTEED_IMAGE] Final fallback error: {e}")
-
     return None
 
 def run_guaranteed_ai_video_engine(prompt: str, job_id: str, input_image_path: Optional[str] = None) -> Optional[str]:
@@ -1241,22 +1225,8 @@ def run_guaranteed_ai_video_engine(prompt: str, job_id: str, input_image_path: O
             except Exception as e:
                 logger.warning(f"[GUARANTEED_VIDEO] Stage fetch failed: {e}")
 
-        if len(keyframes) == 0:
-            base_canvas = np.zeros((height, width, 3), dtype=np.uint8)
-            for y in range(height):
-                r_v = int(20 + 70 * math.sin(y / float(height) * math.pi))
-                g_v = int(30 + 80 * math.cos(y / float(height) * math.pi * 0.5))
-                b_v = int(90 + 100 * math.sin(y / float(height) * math.pi * 0.8))
-                base_canvas[y, :] = (b_v, g_v, r_v)
-            cv2.putText(base_canvas, "RAKA AI STUDIO", (40, 70), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 255), 2, cv2.LINE_AA)
-            clean_text = prompt.strip() if prompt else "AI Video Generation"
-            cv2.putText(base_canvas, clean_text[:35], (40, height // 2), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2, cv2.LINE_AA)
-            keyframes.append(base_canvas)
-
-        if len(keyframes) == 1:
-            img_0 = keyframes[0]
-            img_1 = cv2.convertScaleAbs(img_0, alpha=1.02, beta=3)
-            keyframes.append(img_1)
+        if len(keyframes) < 2:
+            return None
 
         fps = 15
         frames_per_transition = 15
